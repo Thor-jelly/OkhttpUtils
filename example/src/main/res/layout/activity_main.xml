@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/get_tv"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="10dp"
+        android:background="#f00"
+        android:gravity="center"
+        android:text="get请求"
+        android:textSize="30dp" />
+
+
+    <TextView
+        android:id="@+id/post_tv"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="10dp"
+        android:background="#f00"
+        android:gravity="center"
+        android:text="post请求"
+        android:textSize="30dp" />
+
+    <TextView
+        android:id="@+id/socket_tv"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="10dp"
+        android:background="#f00"
+        android:gravity="center"
+        android:text="socket请求"
+        android:textSize="30dp" />
+
+    <TextView
+        android:id="@+id/socket_cancel_tv"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="10dp"
+        android:background="#f00"
+        android:gravity="center"
+        android:text="socket取消请求"
+        android:textSize="30dp" />
+
+    <TextView
+        android:id="@+id/socket_again_tv"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="10dp"
+        android:background="#f00"
+        android:gravity="center"
+        android:text="socket再次请求"
+        android:textSize="30dp" />
+
+    <TextView
+        android:id="@+id/file_uplode_tv"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="10dp"
+        android:background="#f00"
+        android:gravity="center"
+        android:text="文件上传"
+        android:textSize="30dp" />
+
+    <TextView
+        android:id="@+id/down_tv"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="10dp"
+        android:background="#f00"
+        android:gravity="center"
+        android:text="文件下载"
+        android:textSize="30dp" />
+
+</LinearLayout>

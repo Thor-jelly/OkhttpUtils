@@ -1,0 +1,77 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 27
+
+    defaultConfig {
+//        applicationId "com.example.okhttputils"
+        minSdkVersion 15
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.0.6"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    //以下为配置library注释在打包jar后保留
+    // 打包源码jar
+    task sourcesJar(type: Jar) {
+        from android.sourceSets.main.java.srcDirs
+        classifier = 'sources'
+    }
+    task javadoc(type: Javadoc) {
+        failOnError false
+        source = android.sourceSets.main.java.sourceFiles
+        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        classpath += configurations.compile
+    }
+    // 打包文档jar
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+    artifacts {
+        archives sourcesJar
+        archives javadocJar
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:support-annotations:27.1.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+}
+
+//apply plugin: 'maven'
+//uploadArchives {
+//    configuration = configurations.archives
+//    repositories {
+//        mavenDeployer {
+//            snapshotRepository(url: MAVEN_SNAPSHOT_URL) {
+//                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
+//            }
+//            repository(url: URLMAVEN_URL) {
+//                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
+//            }
+//            pom.project {
+//                version '1.0.6'
+//                artifactId 'OKHttpUtils'
+//                groupId GROUP_ID
+//                packaging TYPE
+//                description "输出日志修改"
+//            }
+//        }
+//    }
+//}
+//
+//artifacts {
+//    archives file('okhttputils.aar')
+//}
