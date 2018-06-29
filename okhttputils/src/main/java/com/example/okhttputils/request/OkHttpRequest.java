@@ -21,7 +21,7 @@ public abstract class OkHttpRequest {
     protected Map<String, String> params;
     protected Map<String, String> headers;
     protected int id;
-    protected boolean isShowDialog;
+    public boolean isShowDialog;
     public boolean isShowToast;
 
     protected Request.Builder builder = new Request.Builder();

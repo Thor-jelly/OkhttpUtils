@@ -15,6 +15,8 @@ import com.example.okhttputils.builder.PostFileBuilder;
 import com.example.okhttputils.callback.Callback;
 import com.example.okhttputils.callback.FileCallback;
 import com.example.okhttputils.request.OkHttpRequest;
+import com.example.okhttputils.tag.TagBeen;
+import com.example.okhttputils.utils.LoadDialogUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -22,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.Call;
+import okhttp3.Dispatcher;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
@@ -58,6 +62,9 @@ public class MainActivity extends AppCompatActivity {
         mGetTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                getMethod();
+                getMethod();
+                getMethod();
                 getMethod();
             }
         });
@@ -217,6 +224,9 @@ public class MainActivity extends AppCompatActivity {
     private void postMethod() {
         //https://b.shandian.net/shop/entry/login?format=json&token=&sdSig=b2134ecdfe26ec6a563b3b410abdfebe&sdTime=1526439268
         //mobile=13817975415&password=123456&loginType=0
+
+
+        //
         Map<String, String> map = new HashMap<>();
         map.put("mobile", "13817975415");
         map.put("password", "123456");
@@ -228,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
                 .execute(getCallback());
     }
 
-//    private void getMethod() {
+    //    private void getMethod() {
 //        Map<String, String> map = new HashMap<>();
 //        map.put("shopId", "10189");
 //        map.put("tableVer", "1526380979");
@@ -243,10 +253,15 @@ public class MainActivity extends AppCompatActivity {
 //                .build()
 //                .execute(getCallback());
 //    }
+    int getId = 0;
     private void getMethod() {
+        getId++;
         OkHttpUtils.get()
-                .url("http://v5.qa.ishandian.com.cn/pos/order/showOrderDetail?shopId=10010&oid=201801180030000047&isPay=1&token=10013-ot4UuPldIt2HnMDhAHseXLVdIDHF0qof&format=json")
+                .id(getId)
+//                .url("order/showOrderDetail?&oid=201806190030000011&shopId=10010&isPay=1&token=10013-XCUWLwRtZzSjfkodQH0NL4GpyeFiAVQn&format=json")
+                .url("https://b.shandian.net/pos/order/showOrderDetail?&oid=201806190030000011&shopId=10010&isPay=1&token=10013-XCUWLwRtZzSjfkodQH0NL4GpyeFiAVQn&format=json")
                 .isShowDialog(true)
+                .tag(MainActivity.class)
                 .build()
                 .execute(getCallback());
     }
@@ -268,6 +283,11 @@ public class MainActivity extends AppCompatActivity {
             public Object parseNetworkResponse(Response response, int id, OkHttpRequest okHttpRequest) throws Exception {
                 Log.d(TAG, "parseNetworkResponse: id=" + id + "  response=" + response.body().string());
                 return null;
+            }
+
+            @Override
+            public void onAfter(int id) {
+                super.onAfter(id);
             }
         };
     }

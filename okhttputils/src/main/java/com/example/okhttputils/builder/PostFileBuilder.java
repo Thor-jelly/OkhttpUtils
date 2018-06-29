@@ -1,5 +1,8 @@
 package com.example.okhttputils.builder;
 
+import android.webkit.URLUtil;
+
+import com.example.okhttputils.OkHttpUtils;
 import com.example.okhttputils.request.PostFileRequest;
 import com.example.okhttputils.request.RequestCall;
 
@@ -25,7 +28,23 @@ public class PostFileBuilder extends OkHttpRequestBuilder<PostFileBuilder>{
 
     @Override
     public RequestCall build() {
-        return new PostFileRequest(url, tag, params, headers, id, file, isShowDialog, isShowToast).build();
+        String myUrl;
+        if (baseUrl != null) {
+            if (URLUtil.isValidUrl(url)) {
+                myUrl = url;
+            }else {
+                myUrl = baseUrl + url;
+            }
+        }else if (OkHttpUtils.getInstance().getBaseUrl() != null) {
+            if (URLUtil.isValidUrl(url)) {
+                myUrl = url;
+            }else {
+                myUrl = OkHttpUtils.getInstance().getBaseUrl() + url;
+            }
+        }else {
+            myUrl = url;
+        }
+        return new PostFileRequest(myUrl, tag, params, headers, id, file, isShowDialog, isShowToast).build();
     }
 
     public static class FileInput {

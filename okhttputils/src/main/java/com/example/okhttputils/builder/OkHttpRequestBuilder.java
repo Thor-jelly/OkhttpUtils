@@ -12,6 +12,10 @@ import java.util.Map;
  */
 public abstract class OkHttpRequestBuilder<T extends OkHttpRequestBuilder> {
     /**
+     * 如果url前半段url都相同可以设置baseURL来简化url设置
+     */
+    protected String baseUrl;
+    /**
      * url
      */
     protected String url;
@@ -50,6 +54,11 @@ public abstract class OkHttpRequestBuilder<T extends OkHttpRequestBuilder> {
 
     public T id(int id) {
         this.id = id;
+        return (T) this;
+    }
+
+    public T baseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
         return (T) this;
     }
 

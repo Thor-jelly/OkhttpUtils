@@ -18,6 +18,13 @@ OkHttpClient okHttpClient = new OkHttpClient.Builder()
         OkHttpUtils.initClient(okHttpClient);
 ```
 
+# 配置baseUrl,如果配置的baseUrl则可以在.url的时候设置baseUrl后面连接的地址段
+共同baseUrl可以设置baseURL，如果要在网络的时候设置不同的baseUrl可以用.baseUrl来设置，也可以直接用Url来设置全部的网络连接地址
+
+```
+OkHttpUtils.getInstance().setBaseUrl(baseUrl);
+```
+
 # 配置持久化 cookie
 
 ```

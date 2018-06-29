@@ -4,6 +4,7 @@ import android.support.annotation.MainThread;
 import android.support.annotation.UiThread;
 import android.support.annotation.WorkerThread;
 import android.test.UiThreadTest;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.okhttputils.OkHttpUtils;
@@ -12,6 +13,8 @@ import com.example.okhttputils.tag.TagBeen;
 import com.example.okhttputils.utils.CommentUtils;
 import com.example.okhttputils.utils.GetApplication;
 import com.example.okhttputils.utils.LoadDialogUtil;
+
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Dispatcher;
@@ -23,7 +26,8 @@ import okhttp3.Response;
  * 创建时间：2018/5/14 15:41 <br/>
  */
 public abstract class Callback<T> {
-    private static final String TAG = "123====";
+    private static final String TAG = "OkHttpUtils";
+    public OkHttpRequest mOkHttpRequest;
 
     /**
      * 主线程中
@@ -52,20 +56,46 @@ public abstract class Callback<T> {
      */
     @MainThread
     public void onBefore(int id) {
-        Dispatcher dispatcher = OkHttpUtils.getInstance().getOkHttpClient().dispatcher();
-        for (Call call : dispatcher.runningCalls()) {
-            Object tagTag = call.request().tag();
-            if (tagTag instanceof TagBeen) {
-                TagBeen tagBeen = (TagBeen) tagTag;
-                if (tagBeen.isShowDialog()) {
-                    LoadDialogUtil instance = LoadDialogUtil.getInstance();
-                    if (instance.isShowing()) {
-                        break;
+        if (mOkHttpRequest.isShowDialog) {
+            LoadDialogUtil instance = LoadDialogUtil.getInstance();
+            instance.showLoadDialog(CommentUtils.getActivity());
+        }
+
+        /*Dispatcher dispatcher = OkHttpUtils.getInstance().getOkHttpClient().dispatcher();
+        int runningCallsCount = dispatcher.runningCallsCount();
+        if (runningCallsCount == 0) {
+            if (mOkHttpRequest.isShowDialog) {
+                LoadDialogUtil instance = LoadDialogUtil.getInstance();
+                instance.showLoadDialog(CommentUtils.getActivity());
+            }
+        } else {
+            boolean isShowing = false;
+            for (Call call : dispatcher.runningCalls()) {
+                if (call.isCanceled()) {
+                    continue;
+                }
+                Object tagTag = call.request().tag();
+                if (tagTag instanceof TagBeen) {
+                    TagBeen tagBeen = (TagBeen) tagTag;
+                    if (tagBeen.isShowDialog()) {
+                        LoadDialogUtil instance = LoadDialogUtil.getInstance();
+                        if (instance.isShowing()) {
+                            isShowing = true;
+                            break;
+                        }
                     }
-                    instance.showLoadDialog(CommentUtils.getActivity());
                 }
             }
-        }
+            if (!isShowing) {
+                if (mOkHttpRequest.isShowDialog) {
+                    LoadDialogUtil instance = LoadDialogUtil.getInstance();
+                    if (!instance.isShowing()) {
+                        instance.showLoadDialog(CommentUtils.getActivity());
+                    }
+                }
+            }
+        }*/
+
 
         //下面走自己的逻辑
     }
@@ -75,8 +105,14 @@ public abstract class Callback<T> {
      */
     @MainThread
     public void onAfter(int id) {
-        Dispatcher dispatcher = OkHttpUtils.getInstance().getOkHttpClient().dispatcher();
-        if (dispatcher.runningCallsCount() == 0) {
+        LoadDialogUtil instance = LoadDialogUtil.getInstance();
+        if (instance.isShowing()) {
+            instance.dismissLoadDialog();
+        }
+
+        /*Dispatcher dispatcher = OkHttpUtils.getInstance().getOkHttpClient().dispatcher();
+        int runningCallsCount = dispatcher.runningCallsCount();
+        if (runningCallsCount == 0) {
             LoadDialogUtil instance = LoadDialogUtil.getInstance();
             if (instance.isShowing()) {
                 instance.dismissLoadDialog();
@@ -84,6 +120,9 @@ public abstract class Callback<T> {
         } else {
             boolean isHasShowDialog = false;
             for (Call call : dispatcher.runningCalls()) {
+                if (call.isCanceled()) {
+                    continue;
+                }
                 Object tagTag = call.request().tag();
                 if (tagTag instanceof TagBeen) {
                     TagBeen tagBeen = (TagBeen) tagTag;
@@ -103,11 +142,9 @@ public abstract class Callback<T> {
                     instance.dismissLoadDialog();
                 }
             }
-        }
+        }*/
 
         //下面走自己的逻辑
-
-
     }
 
     /**

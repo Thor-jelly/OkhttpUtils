@@ -15,7 +15,7 @@ public class LoadDialogUtil {
     /**
      * 正在加载网络数据...
      */
-    public static final String NET = "正在加载网络数据...";
+    private static final String NET = "正在加载网络数据...";
 //    /**
 //     * 正在更新本地数据...
 //     */
@@ -27,7 +27,7 @@ public class LoadDialogUtil {
 
     private static LoadDialogUtil mLoadDialogUtil;
 
-    protected ProgressDialog mDialog;
+    private static ProgressDialog mDialog;
     private Activity mActivity;
 
     private LoadDialogUtil() {
@@ -48,8 +48,8 @@ public class LoadDialogUtil {
     public void showLoadDialog(Context context, int messageId) {
         if (mDialog != null && mDialog.isShowing() && mActivity != null && !mActivity.isFinishing() && !mActivity.isDestroyed()) {
             mDialog.dismiss();
-            mActivity = null;
         }
+        mActivity = null;
         mActivity = (Activity) context;
         if (mActivity == null) {
             //CommonUtil.showToast(MyApplication.getContext(), "加载框上下文为空！！！");
@@ -69,18 +69,20 @@ public class LoadDialogUtil {
             mActivity = null;
             return;
         }
+        if (mDialog.isShowing()) {
+            mDialog.dismiss();
+        }
         mDialog.show();
     }
 
     @SuppressLint("NewApi")
     public void dismissLoadDialog() {
-        if (mDialog != null && mDialog.isShowing() && !mActivity.isDestroyed()) {
-            if (mDialog != null && mDialog.isShowing() && mActivity != null && !mActivity.isDestroyed()) {
-                mDialog.dismiss();
-                mDialog = null;
+        if (mDialog != null && mDialog.isShowing() && mActivity != null && !mActivity.isDestroyed()) {
+            mDialog.dismiss();
 //                CommonUtil.debug("123===", "dimiss");
-            }
         }
+        mActivity = null;
+        mDialog = null;
     }
 
     public boolean isShowing() {

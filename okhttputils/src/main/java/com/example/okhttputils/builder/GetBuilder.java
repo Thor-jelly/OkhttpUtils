@@ -1,7 +1,9 @@
 package com.example.okhttputils.builder;
 
 import android.net.Uri;
+import android.webkit.URLUtil;
 
+import com.example.okhttputils.OkHttpUtils;
 import com.example.okhttputils.request.GetRequest;
 import com.example.okhttputils.request.RequestCall;
 
@@ -17,10 +19,26 @@ import java.util.Set;
 public class GetBuilder extends OkHttpRequestBuilder<GetBuilder> implements HasParamsable{
     @Override
     public RequestCall build() {
-        if (params != null) {
-            url = appendParams(url, params);
+        String myUrl;
+        if (baseUrl != null) {
+            if (URLUtil.isValidUrl(url)) {
+                myUrl = url;
+            }else {
+                myUrl = baseUrl + url;
+            }
+        }else if (OkHttpUtils.getInstance().getBaseUrl() != null) {
+            if (URLUtil.isValidUrl(url)) {
+                myUrl = url;
+            }else {
+                myUrl = OkHttpUtils.getInstance().getBaseUrl() + url;
+            }
+        }else {
+            myUrl = url;
         }
-        return new GetRequest(url, tag, headers, id, isShowDialog, isShowToast).build();
+        if (params != null) {
+            myUrl = appendParams(myUrl, params);
+        }
+        return new GetRequest(myUrl, tag, headers, id, isShowDialog, isShowToast).build();
     }
 
     /**
@@ -29,15 +47,13 @@ public class GetBuilder extends OkHttpRequestBuilder<GetBuilder> implements HasP
      * @param params
      * @return
      */
-    protected String appendParams(String url, Map<String, String> params) {
+    private String appendParams(String url, Map<String, String> params) {
         if (url == null || params == null || params.isEmpty()) {
             return url;
         }
         Uri.Builder builder = Uri.parse(url).buildUpon();
         Set<String> keys = params.keySet();
-        Iterator<String> iterator = keys.iterator();
-        while (iterator.hasNext()) {
-            String key = iterator.next();
+        for (String key : keys) {
             builder.appendQueryParameter(key, params.get(key));
         }
         return builder.build().toString();

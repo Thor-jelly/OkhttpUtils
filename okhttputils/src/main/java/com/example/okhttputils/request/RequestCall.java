@@ -2,6 +2,7 @@ package com.example.okhttputils.request;
 
 import android.util.Log;
 
+import com.example.okhttputils.BuildConfig;
 import com.example.okhttputils.OkHttpUtils;
 import com.example.okhttputils.callback.Callback;
 import com.example.okhttputils.utils.CommentUtils;
@@ -30,6 +31,7 @@ public class RequestCall {
     }
 
     public void execute(final Callback callback) {
+        callback.mOkHttpRequest = mOkHttpRequest;
         //判断是否有网络
         boolean isNet = CommentUtils.networkAvailable();
         if (!isNet) {
@@ -55,7 +57,13 @@ public class RequestCall {
             @Override
             public void onFailure(Call call, IOException e) {
                 //在子线程中
-                Log.d("OkHttpUtils", "OkHttp3--->>>onFailure: " + e == null ? "IOException 为null" : e.toString());
+                if (BuildConfig.DEBUG) {
+                    Log.d("OkHttpUtils", mOkHttpRequest.getId() + "-OkHttp3--->>>onFailure: " + (e == null ? "IOException 为null" : e.toString()));
+                    Log.d("OkHttpUtils", mOkHttpRequest.getId() + "-OkHttp3--->>>onFailure: 当前网络是否被被取消=" + call.isCanceled());
+                }
+                if (!call.isCanceled()) {
+                    call.cancel();
+                }
                 //失败回调 主线程中
                 sendOkHttpFail(mOkHttpRequest.getId(), ErrorCode.RESPONSE_NET, "网络异常！", callback);
             }
@@ -77,17 +85,10 @@ public class RequestCall {
                     return;
                 }
 
+                Object o = null;
                 try {
                     //数据解析需要在子线程
-                    final Object o = callback.parseNetworkResponse(response, id, mOkHttpRequest);
-
-                    //如果自定义没有返回null，如果返回null表示不需要执行成功回调onResponse onAfter
-                    //主线程中
-                    if (o != null) {
-                        sendOkHttpSuccess(id, o, callback);
-                    } else {
-                        sendOkhttpAfter(id, callback);
-                    }
+                    o = callback.parseNetworkResponse(response, id, mOkHttpRequest);
                 } catch (Exception e) {
                     e.printStackTrace();
                     //失败回调 主线程中
@@ -96,11 +97,19 @@ public class RequestCall {
                     if (response.body() != null)
                         response.body().close();
                 }
+
+                //如果自定义没有返回null，如果返回null表示不需要执行成功回调onResponse onAfter
+                //主线程中
+                if (o != null) {
+                    sendOkHttpSuccess(id, o, callback);
+                } else {
+                    sendOkHttpAfter(id, callback);
+                }
             }
         });
     }
 
-    private void sendOkhttpAfter(final int id, final Callback callback) {
+    private void sendOkHttpAfter(final int id, final Callback callback) {
         Platform.get().execute(new Runnable() {
             @Override
             public void run() {

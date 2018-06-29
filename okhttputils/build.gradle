@@ -8,7 +8,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 27
         versionCode 1
-        versionName "1.0.6"
+        versionName "1.0.20"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -50,28 +50,28 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
 }
 
-//apply plugin: 'maven'
-//uploadArchives {
-//    configuration = configurations.archives
-//    repositories {
-//        mavenDeployer {
-//            snapshotRepository(url: MAVEN_SNAPSHOT_URL) {
-//                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
-//            }
-//            repository(url: URLMAVEN_URL) {
-//                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
-//            }
-//            pom.project {
-//                version '1.0.6'
-//                artifactId 'OKHttpUtils'
-//                groupId GROUP_ID
-//                packaging TYPE
-//                description "输出日志修改"
-//            }
-//        }
-//    }
-//}
-//
-//artifacts {
-//    archives file('okhttputils.aar')
-//}
+apply plugin: 'maven'
+uploadArchives {
+    configuration = configurations.archives
+    repositories {
+        mavenDeployer {
+            snapshotRepository(url: MAVEN_SNAPSHOT_URL) {
+                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
+            }
+            repository(url: URLMAVEN_URL) {
+                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
+            }
+            pom.project {
+                version '1.0.20'
+                artifactId 'OKHttpUtils'
+                groupId GROUP_ID
+                packaging TYPE
+                description "弹框优化"
+            }
+        }
+    }
+}
+
+artifacts {
+    archives file('okhttputils.aar')
+}

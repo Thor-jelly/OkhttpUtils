@@ -1,5 +1,8 @@
 package com.example.okhttputils.builder;
 
+import android.webkit.URLUtil;
+
+import com.example.okhttputils.OkHttpUtils;
 import com.example.okhttputils.request.PostFormRequest;
 import com.example.okhttputils.request.RequestCall;
 
@@ -19,6 +22,22 @@ public class PostFormBuilder extends OkHttpRequestBuilder<PostFormBuilder> imple
 
     @Override
     public RequestCall build() {
-        return new PostFormRequest(url, tag, params, headers, id, isShowDialog, isShowToast).build();
+        String myUrl;
+        if (baseUrl != null) {
+            if (URLUtil.isValidUrl(url)) {
+                myUrl = url;
+            }else {
+                myUrl = baseUrl + url;
+            }
+        }else if (OkHttpUtils.getInstance().getBaseUrl() != null) {
+            if (URLUtil.isValidUrl(url)) {
+                myUrl = url;
+            }else {
+                myUrl = OkHttpUtils.getInstance().getBaseUrl() + url;
+            }
+        }else {
+            myUrl = url;
+        }
+        return new PostFormRequest(myUrl, tag, params, headers, id, isShowDialog, isShowToast).build();
     }
 }
