@@ -1,3 +1,21 @@
+[![GitHub release](https://img.shields.io/badge/release-v1.0.20-green.svg)](https://github.com/Thor-jelly/OkhttpUtils/releases)
+
+```
+Add it in your root build.gradle at the end of repositories:
+
+	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+Step 2. Add the dependency
+
+	dependencies {
+	        implementation 'com.github.Thor-jelly:OkhttpUtils:v1.0.20'
+	}
+```
+
 # 权限
 
 ```
