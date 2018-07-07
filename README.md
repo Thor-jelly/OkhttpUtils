@@ -1,4 +1,4 @@
-[![GitHub release](https://img.shields.io/badge/release-v1.0.20-green.svg)](https://github.com/Thor-jelly/OkhttpUtils/releases)
+[![GitHub release](https://img.shields.io/badge/release-v1.0.21-green.svg)](https://github.com/Thor-jelly/OkhttpUtils/releases)
 
 ```
 Add it in your root build.gradle at the end of repositories:
@@ -12,7 +12,7 @@ Add it in your root build.gradle at the end of repositories:
 Step 2. Add the dependency
 
 	dependencies {
-	        implementation 'com.github.Thor-jelly:OkhttpUtils:v1.0.20'
+	        implementation 'com.github.Thor-jelly:OkhttpUtils:v1.0.21'
 	}
 ```
 
@@ -41,6 +41,18 @@ OkHttpClient okHttpClient = new OkHttpClient.Builder()
 
 ```
 OkHttpUtils.getInstance().setBaseUrl(baseUrl);
+```
+
+# 添加公共参数
+
+```
+OkHttpUtils.getInstance().addCommonParams(commonParams);
+```
+
+# 添加公共请求头
+
+```
+OkHttpUtils.getInstance().addCommonHeaders(commonHeaders);
 ```
 
 # 配置持久化 cookie
