@@ -8,6 +8,7 @@ import com.example.okhttputils.request.GetRequest;
 import com.example.okhttputils.request.RequestCall;
 
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,8 +36,16 @@ public class GetBuilder extends OkHttpRequestBuilder<GetBuilder> implements HasP
         }else {
             myUrl = url;
         }
+        LinkedHashMap<String, String> commonParams = OkHttpUtils.getInstance().getCommonParams();
         if (params != null) {
+            if (commonParams != null && !commonParams.isEmpty()) {
+                params.putAll(commonParams);
+            }
             myUrl = appendParams(myUrl, params);
+        } else {
+            if (commonParams != null && !commonParams.isEmpty()) {
+                myUrl = appendParams(myUrl, commonParams);
+            }
         }
         return new GetRequest(myUrl, tag, headers, id, isShowDialog, isShowToast).build();
     }

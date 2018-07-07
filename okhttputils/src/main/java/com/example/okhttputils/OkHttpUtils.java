@@ -1,15 +1,17 @@
 package com.example.okhttputils;
 
 
-
 import com.example.okhttputils.builder.GetBuilder;
 import com.example.okhttputils.builder.GetWebSocketBuilder;
 import com.example.okhttputils.builder.PostFileBuilder;
 import com.example.okhttputils.builder.PostFormBuilder;
 import com.example.okhttputils.tag.TagBeen;
 
+import java.util.LinkedHashMap;
+
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
+import okhttp3.internal.http.HttpHeaders;
 
 /**
  * 类描述：okHttp 工具类地址 <br/>
@@ -19,7 +21,12 @@ import okhttp3.OkHttpClient;
 public class OkHttpUtils {
     private volatile static OkHttpUtils mInstance;
     private OkHttpClient mOkHttpClient;
+    /**
+     * 公共的url
+     */
     private String baseUrl;
+    private LinkedHashMap<String, String> mCommonParams;
+    private LinkedHashMap<String, String> mCommonHeaders;
 
     private OkHttpUtils(OkHttpClient okHttpClient) {
         if (okHttpClient == null) {
@@ -54,12 +61,59 @@ public class OkHttpUtils {
         return mOkHttpClient;
     }
 
-    public void setBaseUrl(String baseUrl) {
+    /**
+     * 添加基本url
+     */
+    public OkHttpUtils setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
+        return this;
     }
 
+    /**
+     * 获取基本url
+     */
     public String getBaseUrl() {
         return baseUrl;
+    }
+
+    /**
+     * 获取全局公共请求参数
+     */
+    public LinkedHashMap<String, String> getCommonParams() {
+        return mCommonParams;
+    }
+
+    /**
+     * 添加全局公共请求参数
+     */
+    public OkHttpUtils addCommonParams(LinkedHashMap commonParams) {
+        if (commonParams != null && !commonParams.isEmpty()) {
+            if (mCommonParams == null) {
+                mCommonParams = new LinkedHashMap<>();
+            }
+            mCommonParams.putAll(commonParams);
+        }
+        return this;
+    }
+
+    /**
+     * 获取全局公共请求头
+     */
+    public LinkedHashMap<String, String> getCommonHeaders() {
+        return mCommonHeaders;
+    }
+
+    /**
+     * 添加全局公共请求参数
+     */
+    public OkHttpUtils addCommonHeaders(LinkedHashMap commonHeaders) {
+        if (commonHeaders != null && !commonHeaders.isEmpty()) {
+            if (mCommonHeaders == null) {
+                mCommonHeaders = new LinkedHashMap<>();
+            }
+            mCommonHeaders.putAll(commonHeaders);
+        }
+        return this;
     }
 
     /**

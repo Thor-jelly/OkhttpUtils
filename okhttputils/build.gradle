@@ -8,7 +8,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 27
         versionCode 1
-        versionName "1.0.20"
+        versionName "1.0.21"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -62,11 +62,11 @@ uploadArchives {
                 authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
             }
             pom.project {
-                version '1.0.20'
+                version '1.0.21'
                 artifactId 'OKHttpUtils'
                 groupId GROUP_ID
                 packaging TYPE
-                description "弹框优化"
+                description "添加公共参数和公共头"
             }
         }
     }

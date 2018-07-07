@@ -1,5 +1,8 @@
 package com.example.okhttputils.request;
 
+import com.example.okhttputils.OkHttpUtils;
+
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import okhttp3.FormBody;
@@ -18,9 +21,19 @@ public class PostFormRequest extends OkHttpRequest {
     @Override
     protected RequestBody requestBody() {
         FormBody.Builder formBody = new FormBody.Builder();
-        for (String key : params.keySet()) {
-            formBody.add(key, params.get(key));
+        if (params != null && !params.isEmpty()) {
+            for (String key : params.keySet()) {
+                formBody.add(key, params.get(key));
+            }
         }
+
+        LinkedHashMap<String, String> commonParams = OkHttpUtils.getInstance().getCommonParams();
+        if (commonParams != null && !commonParams.isEmpty()) {
+            for (String key : commonParams.keySet()) {
+                formBody.add(key, commonParams.get(key));
+            }
+        }
+
         return formBody.build();
     }
 }
