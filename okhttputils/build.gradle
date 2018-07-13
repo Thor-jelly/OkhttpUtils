@@ -5,10 +5,10 @@ android {
 
     defaultConfig {
 //        applicationId "com.example.okhttputils"
-        minSdkVersion 15
+        minSdkVersion 19
         targetSdkVersion 27
         versionCode 1
-        versionName "1.0.21"
+        versionName "1.0.23"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -62,7 +62,7 @@ uploadArchives {
                 authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
             }
             pom.project {
-                version '1.0.21'
+                version '1.0.23'
                 artifactId 'OKHttpUtils'
                 groupId GROUP_ID
                 packaging TYPE
