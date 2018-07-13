@@ -8,7 +8,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 27
         versionCode 1
-        versionName "1.0.23"
+        versionName "1.0.24"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -62,7 +62,7 @@ uploadArchives {
                 authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
             }
             pom.project {
-                version '1.0.23'
+                version '1.0.24'
                 artifactId 'OKHttpUtils'
                 groupId GROUP_ID
                 packaging TYPE
