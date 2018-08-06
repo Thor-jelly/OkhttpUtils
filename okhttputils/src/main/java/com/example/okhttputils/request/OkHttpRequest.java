@@ -4,9 +4,7 @@ import com.example.okhttputils.OkHttpUtils;
 import com.example.okhttputils.tag.TagBeen;
 import com.example.okhttputils.utils.Exceptions;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
-
 
 import okhttp3.Headers;
 import okhttp3.Request;
@@ -73,15 +71,13 @@ public abstract class OkHttpRequest {
     private void appendHeaders() {
         Headers.Builder headerBuilder = null;
         if (headers != null && !headers.isEmpty()) {
-            if (headerBuilder == null) {
-                headerBuilder = new Headers.Builder();
-            }
+            headerBuilder = new Headers.Builder();
             for (String key : headers.keySet()) {
                 headerBuilder.add(key, headers.get(key));
             }
         }
 
-        LinkedHashMap<String, String> commonHeaders = OkHttpUtils.getInstance().getCommonHeaders();
+        Map<String, String> commonHeaders = OkHttpUtils.getInstance().getCommonHeaders();
         if (commonHeaders != null && !commonHeaders.isEmpty()) {
             if (headerBuilder == null) {
                 headerBuilder = new Headers.Builder();
@@ -106,7 +102,6 @@ public abstract class OkHttpRequest {
         if (requestBody != null) {
             builder.post(requestBody);
         }
-        Request request = builder.build();
-        return request;
+        return builder.build();
     }
 }

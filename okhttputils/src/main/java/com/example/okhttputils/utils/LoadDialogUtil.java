@@ -66,6 +66,7 @@ public class LoadDialogUtil {
 //            mDialog.setMax(6);
         if (mActivity == null || mActivity.isFinishing() || mActivity.isDestroyed()) {
             mDialog.dismiss();
+            mDialog = null;
             mActivity = null;
             return;
         }

@@ -224,15 +224,13 @@ public class MainActivity extends AppCompatActivity {
     private void postMethod() {
         //https://b.shandian.net/shop/entry/login?format=json&token=&sdSig=b2134ecdfe26ec6a563b3b410abdfebe&sdTime=1526439268
         //mobile=13817975415&password=123456&loginType=0
-
-
         //
         Map<String, String> map = new HashMap<>();
         map.put("mobile", "13817975415");
         map.put("password", "123456");
         map.put("loginType", "0");
         OkHttpUtils.post()
-                .url("http://v5.qa.ishandian.com.cn/shop/entry/login?format=json&token=10013-WCzY5b3qY5CHBjIN4jQCYAt31fI1qNFc&sdSig=b2134ecdfe26ec6a563b3b410abdfebe&sdTime=1526439268")
+                .url("http://v5.qa.ishandian.com.cn/shop/entry/login?token=10013-WCzY5b3qY5CHBjIN4jQCYAt31fI1qNFc&sdSig=b2134ecdfe26ec6a563b3b410abdfebe&sdTime=1526439268")
                 .params(map)
                 .build()
                 .execute(getCallback());
@@ -258,8 +256,8 @@ public class MainActivity extends AppCompatActivity {
         getId++;
         OkHttpUtils.get()
                 .id(getId)
-//                .url("order/showOrderDetail?&oid=201806190030000011&shopId=10010&isPay=1&token=10013-XCUWLwRtZzSjfkodQH0NL4GpyeFiAVQn&format=json")
-                .url("https://b.shandian.net/pos/order/showOrderDetail?&oid=201806190030000011&shopId=10010&isPay=1&token=10013-XCUWLwRtZzSjfkodQH0NL4GpyeFiAVQn&format=json")
+                .url("http://v5.qa.ishandian.com.cn/pos/order/showOrderDetail?&oid=201806190030000011&shopId=10010&isPay=1&token=10013-XCUWLwRtZzSjfkodQH0NL4GpyeFiAVQn&format=json")
+//                .url("https://b.shandian.net/pos/order/showOrderDetail?&oid=201806190030000011&shopId=10010&isPay=1&token=10013-XCUWLwRtZzSjfkodQH0NL4GpyeFiAVQn&format=json")
                 .isShowDialog(true)
                 .tag(MainActivity.class)
                 .build()

@@ -2,7 +2,6 @@ package com.example.okhttputils.builder;
 
 import com.example.okhttputils.request.RequestCall;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -70,19 +69,6 @@ public abstract class OkHttpRequestBuilder<T extends OkHttpRequestBuilder> {
 
     public T tag(Object tag) {
         this.tag = tag;
-        return (T) this;
-    }
-
-    public T headers(Map<String, String> headers) {
-        this.headers = headers;
-        return (T) this;
-    }
-
-    public T addHeader(String key, String val) {
-        if (this.headers == null) {
-            headers = new LinkedHashMap<>();
-        }
-        headers.put(key, val);
         return (T) this;
     }
 

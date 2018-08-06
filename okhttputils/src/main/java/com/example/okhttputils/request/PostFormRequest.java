@@ -2,7 +2,6 @@ package com.example.okhttputils.request;
 
 import com.example.okhttputils.OkHttpUtils;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import okhttp3.FormBody;
@@ -27,7 +26,7 @@ public class PostFormRequest extends OkHttpRequest {
             }
         }
 
-        LinkedHashMap<String, String> commonParams = OkHttpUtils.getInstance().getCommonParams();
+        Map<String, String> commonParams = OkHttpUtils.getInstance().getCommonParams();
         if (commonParams != null && !commonParams.isEmpty()) {
             for (String key : commonParams.keySet()) {
                 formBody.add(key, commonParams.get(key));

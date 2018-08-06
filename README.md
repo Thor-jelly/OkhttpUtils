@@ -1,4 +1,4 @@
-[![GitHub release](https://img.shields.io/badge/release-v1.0.24-green.svg)](https://github.com/Thor-jelly/OkhttpUtils/releases)
+[![GitHub release](https://img.shields.io/badge/release-v1.0.25-green.svg)](https://github.com/Thor-jelly/OkhttpUtils/releases)
 
 ```
 Add it in your root build.gradle at the end of repositories:
@@ -12,7 +12,7 @@ Add it in your root build.gradle at the end of repositories:
 Step 2. Add the dependency
 
 	dependencies {
-	        implementation 'com.github.Thor-jelly:OkhttpUtils:v1.0.24'
+	        implementation 'com.github.Thor-jelly:OkhttpUtils:v1.0.25'
 	}
 ```
 
@@ -43,11 +43,15 @@ OkHttpClient okHttpClient = new OkHttpClient.Builder()
 OkHttpUtils.getInstance().setBaseUrl(baseUrl);
 ```
 
-# 添加公共参数
+# 添加静态公共参数
 
 ```
 OkHttpUtils.getInstance().addCommonParams(commonParams);
 ```
+
+# 添加动态的公共参数
+
+自定义callback，重写addChangeCommonParameters()方法返回自己需要的动态请求参数
 
 # 添加公共请求头
 
@@ -95,7 +99,7 @@ HttpsUtils.SSLParams sslParams = HttpsUtils.getSslSocketFactory(null, null, null
                 .build();
 ```
 
-# 自定义callback，重写parseNetworkResponse()方法返回自己需要的类型
+# 自定义callback，重写parseNetworkResponse()方法返回自己需要的类型，如果返回null则不走onResponse方法，并且需要在null的地方执行onError方法
 
 ```
 public abstract class WddTestCallback extends Callback<User>

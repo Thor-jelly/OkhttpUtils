@@ -10,8 +10,10 @@ import com.example.okhttputils.utils.ErrorCode;
 import com.example.okhttputils.utils.Platform;
 
 import java.io.IOException;
+import java.util.Map;
 
 import okhttp3.Call;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -26,7 +28,7 @@ public class RequestCall {
     private Request mRequest;
     private Call mCall;
 
-    public RequestCall(OkHttpRequest okHttpRequest) {
+    RequestCall(OkHttpRequest okHttpRequest) {
         this.mOkHttpRequest = okHttpRequest;
     }
 
@@ -50,7 +52,21 @@ public class RequestCall {
 
         OkHttpClient okHttpClient = OkHttpUtils.getInstance().getOkHttpClient();
         mRequest = mOkHttpRequest.getRequest();
-        mCall = okHttpClient.newCall(mRequest);
+
+
+        //动态改变的公共参数
+        Map<String, String> changeCommonParameters = callback.addChangeCommonParameters();
+        if (changeCommonParameters != null && !changeCommonParameters.isEmpty()) {
+            HttpUrl.Builder newUrl = mRequest.url().newBuilder();
+            for (Map.Entry<String, String> entry : changeCommonParameters.entrySet()) {
+                newUrl.addQueryParameter(entry.getKey(), entry.getValue());
+            }
+            Request newRequest = mRequest.newBuilder().url(newUrl.build()).build();
+            mCall = okHttpClient.newCall(newRequest);
+        } else {
+            mCall = okHttpClient.newCall(mRequest);
+        }
+
 
         //OkHttpUtils.getInstance().execute(this, callback);
         mCall.enqueue(new okhttp3.Callback() {
@@ -94,8 +110,9 @@ public class RequestCall {
                     //失败回调 主线程中
                     sendOkHttpFail(id, ErrorCode.RESPONSE_ERROR, e.toString(), callback);
                 } finally {
-                    if (response.body() != null)
+                    if (response.body() != null){
                         response.body().close();
+                    }
                 }
 
                 //如果自定义没有返回null，如果返回null表示不需要执行成功回调onResponse onAfter

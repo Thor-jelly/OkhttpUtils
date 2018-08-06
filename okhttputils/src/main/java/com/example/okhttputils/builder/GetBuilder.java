@@ -1,13 +1,13 @@
 package com.example.okhttputils.builder;
 
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.webkit.URLUtil;
 
 import com.example.okhttputils.OkHttpUtils;
 import com.example.okhttputils.request.GetRequest;
 import com.example.okhttputils.request.RequestCall;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -17,26 +17,26 @@ import java.util.Set;
  * 创建人：吴冬冬<br/>
  * 创建时间：2018/5/14 15:05 <br/>
  */
-public class GetBuilder extends OkHttpRequestBuilder<GetBuilder> implements HasParamsable{
+public class GetBuilder extends OkHttpRequestBuilder<GetBuilder> implements HasParamsable, HasHeadersable {
     @Override
     public RequestCall build() {
         String myUrl;
         if (baseUrl != null) {
             if (URLUtil.isValidUrl(url)) {
                 myUrl = url;
-            }else {
+            } else {
                 myUrl = baseUrl + url;
             }
-        }else if (OkHttpUtils.getInstance().getBaseUrl() != null) {
+        } else if (OkHttpUtils.getInstance().getBaseUrl() != null) {
             if (URLUtil.isValidUrl(url)) {
                 myUrl = url;
-            }else {
+            } else {
                 myUrl = OkHttpUtils.getInstance().getBaseUrl() + url;
             }
-        }else {
+        } else {
             myUrl = url;
         }
-        LinkedHashMap<String, String> commonParams = OkHttpUtils.getInstance().getCommonParams();
+        Map<String, String> commonParams = OkHttpUtils.getInstance().getCommonParams();
         if (params != null) {
             if (commonParams != null && !commonParams.isEmpty()) {
                 params.putAll(commonParams);
@@ -52,9 +52,6 @@ public class GetBuilder extends OkHttpRequestBuilder<GetBuilder> implements HasP
 
     /**
      * 拼接url和参数
-     * @param url
-     * @param params
-     * @return
      */
     private String appendParams(String url, Map<String, String> params) {
         if (url == null || params == null || params.isEmpty()) {
@@ -70,17 +67,32 @@ public class GetBuilder extends OkHttpRequestBuilder<GetBuilder> implements HasP
 
 
     @Override
-    public GetBuilder params(Map<String, String> params) {
+    public GetBuilder params(@NonNull Map<String, String> params) {
         this.params = params;
         return this;
     }
 
-//   @Override
-//    public GetBuilder addParams(String key, String val) {
-//        if (this.params == null) {
-//            params = new LinkedHashMap<>();
-//        }
-//        params.put(key, val);
-//        return this;
-//    }
+    @Override
+    public GetBuilder addParam(String key, String value) {
+        if (this.params == null) {
+            params = new LinkedHashMap<>();
+        }
+        params.put(key, value);
+        return this;
+    }
+
+    @Override
+    public GetBuilder headers(@NonNull Map<String, String> headers) {
+        this.headers = headers;
+        return this;
+    }
+
+    @Override
+    public GetBuilder addHeader(String key, String value) {
+        if (this.headers == null) {
+            this.headers = new LinkedHashMap<>();
+        }
+        this.headers.put(key, value);
+        return this;
+    }
 }

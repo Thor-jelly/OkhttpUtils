@@ -2,7 +2,6 @@ package com.example.okhttputils.request;
 
 import java.util.Map;
 
-import okhttp3.Request;
 import okhttp3.RequestBody;
 
 /**

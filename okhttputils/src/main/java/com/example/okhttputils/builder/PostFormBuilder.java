@@ -1,11 +1,13 @@
 package com.example.okhttputils.builder;
 
+import android.support.annotation.NonNull;
 import android.webkit.URLUtil;
 
 import com.example.okhttputils.OkHttpUtils;
 import com.example.okhttputils.request.PostFormRequest;
 import com.example.okhttputils.request.RequestCall;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -13,10 +15,34 @@ import java.util.Map;
  * 创建人：吴冬冬<br/>
  * 创建时间：2018/5/14 17:54 <br/>
  */
-public class PostFormBuilder extends OkHttpRequestBuilder<PostFormBuilder> implements HasParamsable{
+public class PostFormBuilder extends OkHttpRequestBuilder<PostFormBuilder> implements HasParamsable, HasHeadersable{
     @Override
-    public OkHttpRequestBuilder params(Map<String, String> params) {
+    public PostFormBuilder params(Map<String, String> params) {
         this.params = params;
+        return this;
+    }
+
+    @Override
+    public PostFormBuilder addParam(String key, String value) {
+        if (this.params == null) {
+            params = new LinkedHashMap<>();
+        }
+        params.put(key, value);
+        return this;
+    }
+
+    @Override
+    public PostFormBuilder headers(@NonNull Map<String, String> headers) {
+        this.headers = headers;
+        return this;
+    }
+
+    @Override
+    public PostFormBuilder addHeader(String key, String value) {
+        if (this.headers == null) {
+            this.headers = new LinkedHashMap<>();
+        }
+        this.headers.put(key, value);
         return this;
     }
 

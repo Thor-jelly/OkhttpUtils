@@ -1,14 +1,14 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
 
     defaultConfig {
 //        applicationId "com.example.okhttputils"
         minSdkVersion 19
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode 1
-        versionName "1.0.24"
+        versionName "1.0.25"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -50,28 +50,28 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
 }
 
-apply plugin: 'maven'
-uploadArchives {
-    configuration = configurations.archives
-    repositories {
-        mavenDeployer {
-            snapshotRepository(url: MAVEN_SNAPSHOT_URL) {
-                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
-            }
-            repository(url: URLMAVEN_URL) {
-                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
-            }
-            pom.project {
-                version '1.0.24'
-                artifactId 'OKHttpUtils'
-                groupId GROUP_ID
-                packaging TYPE
-                description "添加公共参数和公共头"
-            }
-        }
-    }
-}
-
-artifacts {
-    archives file('okhttputils.aar')
-}
+//apply plugin: 'maven'
+//uploadArchives {
+//    configuration = configurations.archives
+//    repositories {
+//        mavenDeployer {
+//            snapshotRepository(url: MAVEN_SNAPSHOT_URL) {
+//                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
+//            }
+//            repository(url: URLMAVEN_URL) {
+//                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
+//            }
+//            pom.project {
+//                version '1.0.25'
+//                artifactId 'OKHttpUtils'
+//                groupId GROUP_ID
+//                packaging TYPE
+//                description "添加动态公共参数"
+//            }
+//        }
+//    }
+//}
+//
+//artifacts {
+//    archives file('okhttputils.aar')
+//}

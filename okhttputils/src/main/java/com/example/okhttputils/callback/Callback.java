@@ -1,23 +1,16 @@
 package com.example.okhttputils.callback;
 
 import android.support.annotation.MainThread;
-import android.support.annotation.UiThread;
 import android.support.annotation.WorkerThread;
-import android.test.UiThreadTest;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.example.okhttputils.OkHttpUtils;
 import com.example.okhttputils.request.OkHttpRequest;
-import com.example.okhttputils.tag.TagBeen;
 import com.example.okhttputils.utils.CommentUtils;
 import com.example.okhttputils.utils.GetApplication;
 import com.example.okhttputils.utils.LoadDialogUtil;
 
-import java.util.List;
+import java.util.Map;
 
-import okhttp3.Call;
-import okhttp3.Dispatcher;
 import okhttp3.Response;
 
 /**
@@ -152,5 +145,12 @@ public abstract class Callback<T> {
      */
     @MainThread
     public void inProgress(float progress, long total, int id) {
+    }
+
+    /**
+     * 添加动态的公共请求参数
+     */
+    public Map<String,String> addChangeCommonParameters(){
+        return null;
     }
 }

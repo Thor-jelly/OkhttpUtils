@@ -5,7 +5,6 @@ import com.example.okhttputils.builder.PostFileBuilder;
 import com.example.okhttputils.utils.CommentUtils;
 import com.example.okhttputils.utils.Exceptions;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +50,7 @@ public class PostFileRequest extends OkHttpRequest {
             }
         }
 
-        LinkedHashMap<String, String> commonParams = OkHttpUtils.getInstance().getCommonParams();
+        Map<String, String> commonParams = OkHttpUtils.getInstance().getCommonParams();
         if (commonParams != null && !commonParams.isEmpty()) {
             for (String key : commonParams.keySet()) {
                 builder.addFormDataPart(key, commonParams.get(key));
