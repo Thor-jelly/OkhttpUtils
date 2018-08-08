@@ -32,7 +32,7 @@ public class PostFileBuilder extends OkHttpRequestBuilder<PostFileBuilder> imple
     }
 
     @Override
-    public PostFileBuilder addParam(String key, String value) {
+    public PostFileBuilder addParam(@NonNull String key, @NonNull String value) {
         if (this.params == null) {
             params = new LinkedHashMap<>();
         }
@@ -47,7 +47,7 @@ public class PostFileBuilder extends OkHttpRequestBuilder<PostFileBuilder> imple
     }
 
     @Override
-    public PostFileBuilder addHeader(String key, String value) {
+    public PostFileBuilder addHeader(@NonNull String key, @NonNull String value) {
         if (this.headers == null) {
             this.headers = new LinkedHashMap<>();
         }

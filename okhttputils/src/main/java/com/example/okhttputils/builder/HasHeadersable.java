@@ -1,5 +1,7 @@
 package com.example.okhttputils.builder;
 
+import android.support.annotation.NonNull;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -9,6 +11,6 @@ import java.util.Map;
  * 创建时间：2018/8/6 14:18 <br/>
  */
 public interface HasHeadersable {
-    OkHttpRequestBuilder headers(Map<String, String> headers);
-    OkHttpRequestBuilder addHeader(String key, String value);
+    OkHttpRequestBuilder headers(@NonNull Map<String, String> headers);
+    OkHttpRequestBuilder addHeader(@NonNull String key,@NonNull String value);
 }

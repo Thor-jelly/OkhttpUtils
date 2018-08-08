@@ -9,4 +9,8 @@ public class Exceptions {
     public static void illegalArgument(String msg, Object... params) {
         throw new IllegalArgumentException(String.format(msg, params));
     }
+
+    public static void exception(String msg, Object... params) throws Exception {
+        throw new Exception(String.format(msg, params));
+    }
 }

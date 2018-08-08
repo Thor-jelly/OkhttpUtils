@@ -15,15 +15,15 @@ import java.util.Map;
  * 创建人：吴冬冬<br/>
  * 创建时间：2018/5/14 17:54 <br/>
  */
-public class PostFormBuilder extends OkHttpRequestBuilder<PostFormBuilder> implements HasParamsable, HasHeadersable{
+public class PostFormBuilder extends OkHttpRequestBuilder<PostFormBuilder> implements HasParamsable, HasHeadersable {
     @Override
-    public PostFormBuilder params(Map<String, String> params) {
+    public PostFormBuilder params(@NonNull Map<String, String> params) {
         this.params = params;
         return this;
     }
 
     @Override
-    public PostFormBuilder addParam(String key, String value) {
+    public PostFormBuilder addParam(@NonNull String key, @NonNull String value) {
         if (this.params == null) {
             params = new LinkedHashMap<>();
         }
@@ -38,7 +38,7 @@ public class PostFormBuilder extends OkHttpRequestBuilder<PostFormBuilder> imple
     }
 
     @Override
-    public PostFormBuilder addHeader(String key, String value) {
+    public PostFormBuilder addHeader(@NonNull String key, @NonNull String value) {
         if (this.headers == null) {
             this.headers = new LinkedHashMap<>();
         }
@@ -52,16 +52,16 @@ public class PostFormBuilder extends OkHttpRequestBuilder<PostFormBuilder> imple
         if (baseUrl != null) {
             if (URLUtil.isValidUrl(url)) {
                 myUrl = url;
-            }else {
+            } else {
                 myUrl = baseUrl + url;
             }
-        }else if (OkHttpUtils.getInstance().getBaseUrl() != null) {
+        } else if (OkHttpUtils.getInstance().getBaseUrl() != null) {
             if (URLUtil.isValidUrl(url)) {
                 myUrl = url;
-            }else {
+            } else {
                 myUrl = OkHttpUtils.getInstance().getBaseUrl() + url;
             }
-        }else {
+        } else {
             myUrl = url;
         }
         return new PostFormRequest(myUrl, tag, params, headers, id, isShowDialog, isShowToast).build();

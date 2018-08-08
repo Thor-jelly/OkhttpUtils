@@ -73,7 +73,7 @@ public class GetBuilder extends OkHttpRequestBuilder<GetBuilder> implements HasP
     }
 
     @Override
-    public GetBuilder addParam(String key, String value) {
+    public GetBuilder addParam(@NonNull String key, @NonNull String value) {
         if (this.params == null) {
             params = new LinkedHashMap<>();
         }
@@ -88,7 +88,7 @@ public class GetBuilder extends OkHttpRequestBuilder<GetBuilder> implements HasP
     }
 
     @Override
-    public GetBuilder addHeader(String key, String value) {
+    public GetBuilder addHeader(@NonNull String key, @NonNull String value) {
         if (this.headers == null) {
             this.headers = new LinkedHashMap<>();
         }
