@@ -1,5 +1,6 @@
 package com.example.okhttputils.request;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.example.okhttputils.BuildConfig;
@@ -9,6 +10,9 @@ import com.example.okhttputils.utils.CommentUtils;
 import com.example.okhttputils.utils.ErrorCode;
 import com.example.okhttputils.utils.Platform;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -17,6 +21,7 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 /**
  * 类描述：网络请求<br/>
@@ -53,7 +58,6 @@ public class RequestCall {
         OkHttpClient okHttpClient = OkHttpUtils.getInstance().getOkHttpClient();
         mRequest = mOkHttpRequest.getRequest();
 
-
         //动态改变的公共参数
         Map<String, String> changeCommonParameters = callback.addChangeCommonParameters();
         if (changeCommonParameters != null && !changeCommonParameters.isEmpty()) {
@@ -71,7 +75,7 @@ public class RequestCall {
         //OkHttpUtils.getInstance().execute(this, callback);
         mCall.enqueue(new okhttp3.Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 //在子线程中
                 if (BuildConfig.DEBUG) {
                     Log.d("OkHttpUtils", mOkHttpRequest.getId() + "-OkHttp3--->>>onFailure: " + (e == null ? "IOException 为null" : e.toString()));
@@ -85,7 +89,7 @@ public class RequestCall {
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) {
                 final int id = mOkHttpRequest.getId();
                 //在子线程中
                 if (call.isCanceled()) {
@@ -105,13 +109,22 @@ public class RequestCall {
                 try {
                     //数据解析需要在子线程
                     o = callback.parseNetworkResponse(response, id, mOkHttpRequest);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    //失败回调 主线程中
+                    sendOkHttpFail(id, ErrorCode.RESPONSE_NULL, "返回response异常,网址为：" + mRequest.url().toString(), callback);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    //失败回调 主线程中
+                    sendOkHttpFail(id, ErrorCode.RESPONSE_OBJ, "数据解析异常，地址为：" + mRequest.url().toString(), callback);
                 } catch (Exception e) {
                     e.printStackTrace();
                     //失败回调 主线程中
-                    sendOkHttpFail(id, ErrorCode.RESPONSE_ERROR, e.toString(), callback);
+                    sendOkHttpFail(id, ErrorCode.RESPONSE_ERROR, e.toString()+"，地址为："+mRequest.url().toString(), callback);
                 } finally {
-                    if (response.body() != null){
-                        response.body().close();
+                    ResponseBody body = response.body();
+                    if (body != null) {
+                        body.close();
                     }
                 }
 
