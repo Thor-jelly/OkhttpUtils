@@ -28,23 +28,20 @@ public class CommentUtils {
 //    public static void aa() {
 //        OkHttpUtils.getWebSocket().newBuild().execute();
 //    }
+
     /**
      * 判断当前是否有网络
      */
     public static boolean networkAvailable() {
         Context context = GetApplication.get().getApplicationContext();
         //得到链接管理器对象
-        try {
-            ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            @SuppressLint("MissingPermission")
-            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-            if (activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
-                return true;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager == null) {
+            return false;
         }
-        return false;
+        @SuppressLint("MissingPermission")
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     /**
@@ -79,8 +76,7 @@ public class CommentUtils {
                 if (!pausedField.getBoolean(activityRecord)) {
                     Field activityField = activityRecordClass.getDeclaredField("activity");
                     activityField.setAccessible(true);
-                    Activity activity = (Activity) activityField.get(activityRecord);
-                    return activity;
+                    return (Activity) activityField.get(activityRecord);
                 }
             }
         } catch (ClassNotFoundException e) {

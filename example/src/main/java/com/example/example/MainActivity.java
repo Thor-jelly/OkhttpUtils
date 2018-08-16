@@ -1,10 +1,10 @@
 package com.example.example;
 
+import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -15,8 +15,6 @@ import com.example.okhttputils.builder.PostFileBuilder;
 import com.example.okhttputils.callback.Callback;
 import com.example.okhttputils.callback.FileCallback;
 import com.example.okhttputils.request.OkHttpRequest;
-import com.example.okhttputils.tag.TagBeen;
-import com.example.okhttputils.utils.LoadDialogUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,8 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import okhttp3.Call;
-import okhttp3.Dispatcher;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
@@ -63,9 +61,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 getMethod();
-                getMethod();
-                getMethod();
-                getMethod();
             }
         });
 
@@ -80,7 +75,8 @@ public class MainActivity extends AppCompatActivity {
         mSocketTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                socketMethod();
+                //socketMethod();
+                testSocketMethod();
             }
         });
 
@@ -170,6 +166,55 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 测试关闭接口是否有回调的
+     */
+    private void testSocketMethod() {
+        Request request = new Request.Builder().url("ws://echo.websocket.org").build();
+//        Request request = new Request.Builder().url("wss://ws.shandian.net:8082").build();
+        OkHttpClient client = new OkHttpClient();
+        WebSocket ws = client.newWebSocket(request, new WebSocketListener(){
+            private static final int NORMAL_CLOSURE_STATUS = 1000;
+
+            @Override
+            public void onOpen(WebSocket webSocket, Response response) {
+//                webSocket.send("{\"cmd\":\"login\",\"roomId\":\"10010\",\"token\":\"10013-gG6NP4myIFHcvwsB9h6UBABMH5HvM4P0\"}");
+                webSocket.send("Hello, it's SSaurel !");
+                webSocket.send("What's up ?");
+                webSocket.send(ByteString.decodeHex("deadbeef"));
+                webSocket.close(NORMAL_CLOSURE_STATUS, "我是谁 !");
+            }
+
+            @Override
+            public void onMessage(WebSocket webSocket, String text) {
+                Log.d(TAG,"Receiving : " + text);
+            }
+
+            @Override
+            public void onMessage(WebSocket webSocket, ByteString bytes) {
+                Log.d(TAG,"Receiving bytes : " + bytes.hex());
+            }
+
+            @Override
+            public void onClosing(WebSocket webSocket, int code, String reason) {
+                //webSocket.close(NORMAL_CLOSURE_STATUS, null);
+                Log.d(TAG,"Closing : " + code + " / " + reason);
+            }
+
+            @Override
+            public void onClosed(WebSocket webSocket, int code, String reason) {
+                super.onClosed(webSocket, code, reason);
+                Log.d(TAG,"onClosed : " + code + " / " + reason);
+            }
+
+            @Override
+            public void onFailure(WebSocket webSocket, Throwable t, Response response) {
+                Log.d(TAG,"Error : " + t.getMessage());
+            }
+        });
+        client.dispatcher().executorService().shutdown();
+    }
+
     private void socketMethod() {
         OkHttpUtils.WebSocket()
                 .url("wss://ws.shandian.net:8082")
@@ -206,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClosed(WebSocket webSocket, int code, String reason) {
                         super.onClosed(webSocket, code, reason);
-                        Log.d(TAG, "onClosed: 关闭->code:" + code + " --reason:" + reason.toString());
+                        Log.d(TAG, "onClosed: 关闭->code:" + code + " --reason:" + reason);
                         Log.d(TAG, "onClosed: 1->" + (mSocket == null));
                         Log.d(TAG, "onClosed: 2->" + (webSocket == null));
                     }
