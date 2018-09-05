@@ -2,7 +2,7 @@ package com.example.okhttputils.request;
 
 import com.example.okhttputils.OkHttpUtils;
 import com.example.okhttputils.builder.PostFileBuilder;
-import com.example.okhttputils.utils.CommentUtils;
+import com.example.okhttputils.utils.CommontUtils;
 import com.example.okhttputils.utils.Exceptions;
 
 import java.util.List;
@@ -59,7 +59,7 @@ public class PostFileRequest extends OkHttpRequest {
 
         for (int i = 0; file != null && i < file.size(); i++) {
             PostFileBuilder.FileInput fileInput = file.get(i);
-            RequestBody fileBody = RequestBody.create(MediaType.parse(CommentUtils.guessMimeType(fileInput.filename)), fileInput.file);
+            RequestBody fileBody = RequestBody.create(MediaType.parse(CommontUtils.guessMimeType(fileInput.filename)), fileInput.file);
             builder.addFormDataPart(fileInput.key, fileInput.filename, fileBody);
         }
         return builder.build();

@@ -6,12 +6,11 @@ import android.util.Log;
 import com.example.okhttputils.BuildConfig;
 import com.example.okhttputils.OkHttpUtils;
 import com.example.okhttputils.callback.Callback;
-import com.example.okhttputils.utils.CommentUtils;
+import com.example.okhttputils.utils.CommontUtils;
 import com.example.okhttputils.utils.ErrorCode;
 import com.example.okhttputils.utils.Platform;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Map;
@@ -40,7 +39,7 @@ public class RequestCall {
     public void execute(final Callback callback) {
         callback.mOkHttpRequest = mOkHttpRequest;
         //判断是否有网络
-        boolean isNet = CommentUtils.networkAvailable();
+        boolean isNet = CommontUtils.networkAvailable();
         if (!isNet) {
             //失败回调 主线程中
             sendOkHttpFail(mOkHttpRequest.getId(), ErrorCode.RESPONSE_NET, "当前没有网络！", callback);

@@ -24,7 +24,7 @@ import java.util.Map;
  * 创建人：吴冬冬<br/>
  * 创建时间：2018/5/15 10:37 <br/>
  */
-public class CommentUtils {
+public class CommontUtils {
 //    public static void aa() {
 //        OkHttpUtils.getWebSocket().newBuild().execute();
 //    }

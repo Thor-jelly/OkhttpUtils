@@ -5,7 +5,7 @@ import android.support.annotation.WorkerThread;
 import android.widget.Toast;
 
 import com.example.okhttputils.request.OkHttpRequest;
-import com.example.okhttputils.utils.CommentUtils;
+import com.example.okhttputils.utils.CommontUtils;
 import com.example.okhttputils.utils.GetApplication;
 import com.example.okhttputils.utils.LoadDialogUtil;
 
@@ -51,7 +51,7 @@ public abstract class Callback<T> {
     public void onBefore(int id) {
         if (mOkHttpRequest.isShowDialog) {
             LoadDialogUtil instance = LoadDialogUtil.getInstance();
-            instance.showLoadDialog(CommentUtils.getActivity());
+            instance.showLoadDialog(CommontUtils.getActivity());
         }
 
         /*Dispatcher dispatcher = OkHttpUtils.getInstance().getOkHttpClient().dispatcher();
@@ -59,7 +59,7 @@ public abstract class Callback<T> {
         if (runningCallsCount == 0) {
             if (mOkHttpRequest.isShowDialog) {
                 LoadDialogUtil instance = LoadDialogUtil.getInstance();
-                instance.showLoadDialog(CommentUtils.getActivity());
+                instance.showLoadDialog(CommontUtils.getActivity());
             }
         } else {
             boolean isShowing = false;
@@ -83,7 +83,7 @@ public abstract class Callback<T> {
                 if (mOkHttpRequest.isShowDialog) {
                     LoadDialogUtil instance = LoadDialogUtil.getInstance();
                     if (!instance.isShowing()) {
-                        instance.showLoadDialog(CommentUtils.getActivity());
+                        instance.showLoadDialog(CommontUtils.getActivity());
                     }
                 }
             }
