@@ -8,10 +8,9 @@ android {
         minSdkVersion 19
         targetSdkVersion 28
         versionCode 1
-        versionName "1.0.29"
+        versionName "1.0.30"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -46,8 +45,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:support-annotations:27.1.1'
-    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    implementation 'androidx.annotation:annotation:1.0.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
 }
 
 //apply plugin: 'maven'
@@ -62,11 +61,11 @@ dependencies {
 //                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
 //            }
 //            pom.project {
-//                version '1.0.29'
+//                version '1.0.30'
 //                artifactId 'OKHttpUtils'
 //                groupId GROUP_ID
 //                packaging TYPE
-//                description "修改文件名"
+//                description "androidX支持"
 //            }
 //        }
 //    }

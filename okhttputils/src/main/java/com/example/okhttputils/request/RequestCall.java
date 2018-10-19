@@ -1,6 +1,6 @@
 package com.example.okhttputils.request;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.example.okhttputils.BuildConfig;

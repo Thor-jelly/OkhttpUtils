@@ -1,7 +1,7 @@
 package com.example.okhttputils.builder;
 
 import android.net.Uri;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.webkit.URLUtil;
 
 import com.example.okhttputils.OkHttpUtils;
