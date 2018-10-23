@@ -1,6 +1,5 @@
 package com.example.okhttputils.builder;
 
-import androidx.annotation.NonNull;
 import android.webkit.URLUtil;
 
 import com.example.okhttputils.OkHttpUtils;
@@ -11,6 +10,8 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import androidx.annotation.NonNull;
 
 /**
  * 类描述：文件上传<br/>

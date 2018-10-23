@@ -3,14 +3,7 @@ package com.example.okhttputils.utils;
 import android.annotation.SuppressLint;
 import android.app.Application;
 
-import com.example.okhttputils.OkHttpUtils;
-
 import java.lang.reflect.Method;
-
-import okhttp3.Response;
-import okhttp3.WebSocket;
-import okhttp3.WebSocketListener;
-import okio.ByteString;
 
 /**
  * 类描述：通过反射获取Application上下文<br/>

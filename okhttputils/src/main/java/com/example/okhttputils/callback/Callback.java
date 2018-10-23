@@ -1,7 +1,5 @@
 package com.example.okhttputils.callback;
 
-import androidx.annotation.MainThread;
-import androidx.annotation.WorkerThread;
 import android.widget.Toast;
 
 import com.example.okhttputils.request.OkHttpRequest;
@@ -11,6 +9,8 @@ import com.example.okhttputils.utils.LoadDialogUtil;
 
 import java.util.Map;
 
+import androidx.annotation.MainThread;
+import androidx.annotation.WorkerThread;
 import okhttp3.Response;
 
 /**

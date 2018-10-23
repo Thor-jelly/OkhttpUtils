@@ -9,9 +9,6 @@ import com.example.okhttputils.log.LoggerInterceptor;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSession;
-
 import okhttp3.CipherSuite;
 import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;

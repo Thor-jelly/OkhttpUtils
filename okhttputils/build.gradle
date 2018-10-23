@@ -8,7 +8,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 28
         versionCode 1
-        versionName "1.0.30"
+        versionName "1.0.31"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -61,11 +61,11 @@ dependencies {
 //                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
 //            }
 //            pom.project {
-//                version '1.0.30'
+//                version '1.0.31'
 //                artifactId 'OKHttpUtils'
 //                groupId GROUP_ID
 //                packaging TYPE
-//                description "androidX支持"
+//                description "androidX支持 引用包修复"
 //            }
 //        }
 //    }

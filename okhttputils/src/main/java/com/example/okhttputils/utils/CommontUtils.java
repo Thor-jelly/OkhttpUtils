@@ -2,12 +2,9 @@ package com.example.okhttputils.utils;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-
-import com.example.okhttputils.OkHttpUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;

@@ -1,7 +1,6 @@
 package com.example.okhttputils.builder;
 
 import android.net.Uri;
-import androidx.annotation.NonNull;
 import android.webkit.URLUtil;
 
 import com.example.okhttputils.OkHttpUtils;
@@ -11,6 +10,8 @@ import com.example.okhttputils.request.RequestCall;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+
+import androidx.annotation.NonNull;
 
 /**
  * 类描述：getBuilder <br/>

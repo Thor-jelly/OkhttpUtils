@@ -1,4 +1,4 @@
-[![GitHub release](https://img.shields.io/badge/release-v1.0.30-green.svg)](https://github.com/Thor-jelly/OkhttpUtils/releases)
+[![GitHub release](https://img.shields.io/badge/release-v1.0.31-green.svg)](https://github.com/Thor-jelly/OkhttpUtils/releases)
 
 ```
 Add it in your root build.gradle at the end of repositories:
