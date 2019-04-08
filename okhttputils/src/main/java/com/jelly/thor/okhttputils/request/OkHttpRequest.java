@@ -86,20 +86,26 @@ public abstract class OkHttpRequest {
 
     private void appendHeaders() {
         Headers.Builder headerBuilder = null;
-        if (headers != null && !headers.isEmpty()) {
+
+        //通用请求头
+        Map<String, String> commonHeaders = OkHttpUtils.getInstance().getCommonHeaders();
+        if (commonHeaders != null && !commonHeaders.isEmpty()) {
             headerBuilder = new Headers.Builder();
-            for (String key : headers.keySet()) {
-                headerBuilder.add(key, headers.get(key));
+
+            for (Map.Entry<String, String> entry : commonHeaders.entrySet()) {
+                builder.removeHeader(entry.getKey());
+                headerBuilder.add(entry.getKey(), entry.getValue());
             }
         }
 
-        Map<String, String> commonHeaders = OkHttpUtils.getInstance().getCommonHeaders();
-        if (commonHeaders != null && !commonHeaders.isEmpty()) {
+        //当前请求设置的请求头
+        if (headers != null && !headers.isEmpty()) {
             if (headerBuilder == null) {
                 headerBuilder = new Headers.Builder();
             }
-            for (String key : commonHeaders.keySet()) {
-                headerBuilder.add(key, commonHeaders.get(key));
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                builder.removeHeader(entry.getKey());
+                headerBuilder.add(entry.getKey(), entry.getValue());
             }
         }
 

@@ -1,12 +1,16 @@
 package com.jelly.thor.example;
 
 import android.app.Application;
+import android.content.Context;
+import android.os.Build;
+import android.webkit.WebSettings;
 
 import com.jelly.thor.okhttputils.OkHttpUtils;
 import com.jelly.thor.okhttputils.https.HttpsUtils;
 import com.jelly.thor.okhttputils.log.LoggerInterceptor;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.CipherSuite;
@@ -51,5 +55,32 @@ public class MyApplication extends Application {
         OkHttpUtils.initClient(okHttpClient);
 
 //        OkHttpUtils.getInstance().setBaseUrl("https://b.shandian.net/pos/");
+        LinkedHashMap<String, String> m = new LinkedHashMap<>();
+        m.put("User-Agent", getUserAgent(this));
+        OkHttpUtils.getInstance().addCommonHeaders(m);
+    }
+
+
+    private static String getUserAgent(Context context) {
+        String userAgent = "";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            try {
+                userAgent = WebSettings.getDefaultUserAgent(context);
+            } catch (Exception e) {
+                userAgent = System.getProperty("http.agent");
+            }
+        } else {
+            userAgent = System.getProperty("http.agent");
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0, length = userAgent.length(); i < length; i++) {
+            char c = userAgent.charAt(i);
+            if (c <= '\u001f' || c >= '\u007f') {
+                sb.append(String.format("\\u%04x", (int) c));
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 }
