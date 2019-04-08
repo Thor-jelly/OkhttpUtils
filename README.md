@@ -1,4 +1,4 @@
-[![GitHub release](https://img.shields.io/badge/release-v1.0.34-green.svg)](https://github.com/Thor-jelly/OkhttpUtils/releases)
+[![GitHub release](https://img.shields.io/badge/release-v1.0.35-green.svg)](https://github.com/Thor-jelly/OkhttpUtils/releases)
 
 > [OkHttp使用教程](http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2015/0106/2275.html)
 
