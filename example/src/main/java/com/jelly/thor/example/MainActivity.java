@@ -16,7 +16,6 @@ import com.jelly.thor.okhttputils.request.OkHttpRequest;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -145,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
         File downloadCacheDirectory = Environment.getDownloadCacheDirectory();
         File externalStorageDirectory = Environment.getExternalStorageDirectory();
         String absolutePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath();
-        File file = new File(Environment.getExternalStorageDirectory(),"DCIM/Camera/IMG_20180517_100948.jpg");
+        File file = new File(Environment.getExternalStorageDirectory(), "DCIM/Camera/IMG_20180517_100948.jpg");
         if (!file.exists()) {
             Toast.makeText(MainActivity.this, "文件不存在，请修改文件路径", Toast.LENGTH_SHORT).show();
             return;
@@ -183,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
         Request request = new Request.Builder().url("ws://echo.websocket.org").build();
 //        Request request = new Request.Builder().url("wss://ws.shandian.net:8082").build();
         OkHttpClient client = new OkHttpClient();
-        WebSocket ws = client.newWebSocket(request, new WebSocketListener(){
+        WebSocket ws = client.newWebSocket(request, new WebSocketListener() {
             private static final int NORMAL_CLOSURE_STATUS = 1000;
 
             @Override
@@ -197,29 +196,29 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onMessage(WebSocket webSocket, String text) {
-                Log.d(TAG,"Receiving : " + text);
+                Log.d(TAG, "Receiving : " + text);
             }
 
             @Override
             public void onMessage(WebSocket webSocket, ByteString bytes) {
-                Log.d(TAG,"Receiving bytes : " + bytes.hex());
+                Log.d(TAG, "Receiving bytes : " + bytes.hex());
             }
 
             @Override
             public void onClosing(WebSocket webSocket, int code, String reason) {
                 //webSocket.close(NORMAL_CLOSURE_STATUS, null);
-                Log.d(TAG,"Closing : " + code + " / " + reason);
+                Log.d(TAG, "Closing : " + code + " / " + reason);
             }
 
             @Override
             public void onClosed(WebSocket webSocket, int code, String reason) {
                 super.onClosed(webSocket, code, reason);
-                Log.d(TAG,"onClosed : " + code + " / " + reason);
+                Log.d(TAG, "onClosed : " + code + " / " + reason);
             }
 
             @Override
             public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-                Log.d(TAG,"Error : " + t.getMessage());
+                Log.d(TAG, "Error : " + t.getMessage());
             }
         });
         client.dispatcher().executorService().shutdown();
@@ -251,7 +250,6 @@ public class MainActivity extends AppCompatActivity {
                     }
 
 
-
                     @Override
                     public void onClosing(WebSocket webSocket, int code, String reason) {
                         super.onClosing(webSocket, code, reason);
@@ -281,17 +279,13 @@ public class MainActivity extends AppCompatActivity {
         map.put("mobile", "13817975415");
         map.put("password", "123456");
         map.put("loginType", "0");
+
         OkHttpUtils.postString()
                 .url("http://v5.qa.ishandian.com.cn/shop/entry/login?token=10013-WCzY5b3qY5CHBjIN4jQCYAt31fI1qNFc&sdSig=b2134ecdfe26ec6a563b3b410abdfebe&sdTime=1526439268")
-                .params(map)
+                .addParam("scannerGunCode", "44a159c5cfc6696")
+                .addParam("action", String.valueOf(2))
                 .build()
                 .execute(new Callback() {
-                    @Override
-                    public Map<String, String> addChangeCommonParameters() {
-                        LinkedHashMap<String, String> m = new LinkedHashMap<>();
-                        m.put("test", "test");
-                        return m;
-                    }
 
                     @Override
                     public void onResponse(int code, Object response, int id) {
@@ -336,6 +330,7 @@ public class MainActivity extends AppCompatActivity {
 //                .execute(getCallback());
 //    }
     int getId = 0;
+
     private void getMethod() {
         getId++;
         OkHttpUtils.get()

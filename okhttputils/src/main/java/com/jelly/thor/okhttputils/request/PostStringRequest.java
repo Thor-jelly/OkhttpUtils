@@ -2,12 +2,12 @@ package com.jelly.thor.okhttputils.request;
 
 import com.jelly.thor.okhttputils.OkHttpUtils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Map;
 
-import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 
@@ -47,10 +47,26 @@ public class PostStringRequest extends OkHttpRequest {
                 if (value == null) {
                     throw new IllegalArgumentException("参数中的" + key + " 赋值为null");
                 }
-                try {
-                    jsonObject.put(key, value);
-                } catch (JSONException e) {
-                    throw new IllegalArgumentException("post json 格式异常：" + e.getMessage());
+                if (value.startsWith("[") && value.endsWith("]")) {
+                    try {
+                        JSONArray newJSONArr = new JSONArray(value);
+                        jsonObject.put(key, newJSONArr);
+                    } catch (JSONException e) {
+                        throw new IllegalArgumentException("post json 格式异常：" + e.getMessage());
+                    }
+                } else if (value.startsWith("{") && value.endsWith("}")) {
+                    try {
+                        JSONObject newObj = new JSONObject(value);
+                        jsonObject.put(key, newObj);
+                    } catch (JSONException e) {
+                        throw new IllegalArgumentException("post json 格式异常：" + e.getMessage());
+                    }
+                } else {
+                    try {
+                        jsonObject.put(key, value);
+                    } catch (JSONException e) {
+                        throw new IllegalArgumentException("post json 格式异常：" + e.getMessage());
+                    }
                 }
             }
         }
