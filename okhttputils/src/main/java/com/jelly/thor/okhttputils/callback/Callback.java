@@ -26,11 +26,13 @@ public abstract class Callback<T> {
      * 主线程中
      */
     @MainThread
-    public void onError(int code, String errorMessage, int id, OkHttpRequest okHttpRequest){
+    public void onError(int code, String errorMessage, int id, OkHttpRequest okHttpRequest) {
         if (okHttpRequest.isShowToast) {
             Toast.makeText(GetApplication.get().getApplicationContext(), errorMessage, Toast.LENGTH_LONG).show();
         }
-    };
+    }
+
+    ;
 
     /**
      * 主线程中
@@ -150,7 +152,7 @@ public abstract class Callback<T> {
     /**
      * 动态追加的公共参数
      */
-    public Map<String,String> addChangeCommonParameters(){
+    public Map<String, String> addChangeCommonParameters() {
         return null;
     }
 }

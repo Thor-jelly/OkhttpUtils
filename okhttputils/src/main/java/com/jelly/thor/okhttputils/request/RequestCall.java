@@ -1,7 +1,5 @@
 package com.jelly.thor.okhttputils.request;
 
-import androidx.annotation.NonNull;
-
 import android.util.Log;
 
 import com.jelly.thor.okhttputils.BuildConfig;
@@ -12,14 +10,18 @@ import com.jelly.thor.okhttputils.utils.ErrorCode;
 import com.jelly.thor.okhttputils.utils.Platform;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Map;
 
+import androidx.annotation.NonNull;
 import okhttp3.Call;
+import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
@@ -68,6 +70,34 @@ public class RequestCall {
         //动态追加的公共参数
         Map<String, String> changeCommonParameters = callback.addChangeCommonParameters();
         if (changeCommonParameters != null && !changeCommonParameters.isEmpty()) {
+            String method = mRequest.method();
+//            switch (method) {
+//                case "POST":
+//                    RequestBody body = mRequest.body();
+//                    if (body instanceof FormBody) {
+//                        //键值对形式
+//                        FormBody.Builder newFormBody = new FormBody.Builder();
+//                        FormBody oldFormBody = (FormBody) body;
+//                        //把旧的添加进新的
+//                        for (int i = 0; i < oldFormBody.size(); i++) {
+//                            newFormBody.add(oldFormBody.encodedName(i), oldFormBody.encodedValue(i));
+//                        }
+//                        //添加新的
+//                        for (Map.Entry<String, String> entry : changeCommonParameters.entrySet()) {
+//                            newFormBody.add(entry.getKey(), entry.getValue());
+//                        }
+//                        //重新创建一个新的request
+//                        FormBody build = newFormBody.build();
+//                        Request newRequest = mRequest.newBuilder()
+//                                .post(build)
+//                                .build();
+//                        mCall = okHttpClient.newCall(newRequest);
+//                    } else {
+//                        //暂时只有json格式
+//
+//                    }
+//                    break;
+//                default:
             HttpUrl.Builder newUrl = mRequest.url().newBuilder();
             for (Map.Entry<String, String> entry : changeCommonParameters.entrySet()) {
                 String key = entry.getKey();
@@ -80,6 +110,8 @@ public class RequestCall {
             }
             Request newRequest = mRequest.newBuilder().url(newUrl.build()).build();
             mCall = okHttpClient.newCall(newRequest);
+//                    break;
+//            }
         } else {
             mCall = okHttpClient.newCall(mRequest);
         }

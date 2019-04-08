@@ -16,6 +16,7 @@ import com.jelly.thor.okhttputils.request.OkHttpRequest;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView mSocketAgainTv;
     private TextView mFileUplodeTv;
     private TextView mDownTv;
+    private TextView mPostStringTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mGetTv = (TextView) findViewById(R.id.get_tv);
         mPostTv = (TextView) findViewById(R.id.post_tv);
+        mPostStringTv = (TextView) findViewById(R.id.post_string_tv);
         mSocketTv = (TextView) findViewById(R.id.socket_tv);
         mSocketCancelTv = (TextView) findViewById(R.id.socket_cancel_tv);
         mSocketAgainTv = (TextView) findViewById(R.id.socket_again_tv);
@@ -69,6 +72,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 postMethod();
+            }
+        });
+
+        mPostStringTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                postStringMethod();
             }
         });
 
@@ -262,6 +272,35 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(TAG, "onFailure: 失败->Throwable:" + t.getMessage());
                         Log.d(TAG, "onFailure: 1->" + (mSocket == null));
                         Log.d(TAG, "onFailure: 2->" + (webSocket == null));
+                    }
+                });
+    }
+
+    private void postStringMethod() {
+        Map<String, String> map = new HashMap<>();
+        map.put("mobile", "13817975415");
+        map.put("password", "123456");
+        map.put("loginType", "0");
+        OkHttpUtils.postString()
+                .url("http://v5.qa.ishandian.com.cn/shop/entry/login?token=10013-WCzY5b3qY5CHBjIN4jQCYAt31fI1qNFc&sdSig=b2134ecdfe26ec6a563b3b410abdfebe&sdTime=1526439268")
+                .params(map)
+                .build()
+                .execute(new Callback() {
+                    @Override
+                    public Map<String, String> addChangeCommonParameters() {
+                        LinkedHashMap<String, String> m = new LinkedHashMap<>();
+                        m.put("test", "test");
+                        return m;
+                    }
+
+                    @Override
+                    public void onResponse(int code, Object response, int id) {
+
+                    }
+
+                    @Override
+                    public Object parseNetworkResponse(Response response, int id, OkHttpRequest okHttpRequest) throws Exception {
+                        return null;
                     }
                 });
     }

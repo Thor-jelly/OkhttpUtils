@@ -1,5 +1,7 @@
 [![GitHub release](https://img.shields.io/badge/release-v1.0.32-green.svg)](https://github.com/Thor-jelly/OkhttpUtils/releases)
 
+> [OkHttp使用教程](http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2015/0106/2275.html)
+
 ```
 Add it in your root build.gradle at the end of repositories:
 

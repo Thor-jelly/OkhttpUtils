@@ -11,6 +11,7 @@ import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okio.Buffer;
 
 /**
  * 类描述：日志拦截器,网上搜索的一个<br/>
@@ -58,11 +59,25 @@ public class LoggerInterceptor implements Interceptor {
                     if (request.body() instanceof FormBody) {
                         FormBody body = (FormBody) request.body();
                         for (int i = 0; i < body.size(); i++) {
-                            sb.append(body.encodedName(i) + "=" + body.encodedValue(i) + ",");
+                            sb.append(body.encodedName(i))
+                                    .append("=")
+                                    .append(body.encodedValue(i))
+                                    .append(",");
                         }
                         sb.delete(sb.length() - 1, sb.length());
-                        Log.d(tag, "RequestParams:{" + sb.toString() + "}");
+                    } else {
+                        //暂时只有键值对和json格式
+                        final Request copy = request.newBuilder().build();
+                        final Buffer buffer = new Buffer();
+                        try {
+                            copy.body().writeTo(buffer);
+                            String readUtf8 = buffer.readUtf8();
+                            sb.append(readUtf8);
+                        } catch (IOException e) {
+                            sb.append("something error when show requestBody.");
+                        }
                     }
+                    Log.d(tag, "RequestParams:{" + sb.toString() + "}");
                 }
 
                 ResponseBody body = response.body();

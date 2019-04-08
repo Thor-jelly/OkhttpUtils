@@ -11,7 +11,7 @@ import okhttp3.RequestBody;
  */
 public class GetRequest extends OkHttpRequest {
     public GetRequest(String url, Object tag, Map<String, String> headers, int id, boolean isShowDialog, boolean isShowToast) {
-        super(url, tag, null, headers, id, isShowDialog, isShowToast);
+        super(url, tag, headers, id, isShowDialog, isShowToast);
     }
 
     @Override

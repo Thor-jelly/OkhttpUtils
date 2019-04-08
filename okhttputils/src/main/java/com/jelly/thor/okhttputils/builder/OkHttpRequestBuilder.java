@@ -30,6 +30,7 @@ public abstract class OkHttpRequestBuilder<T extends OkHttpRequestBuilder> {
      * 参数
      */
     protected Map<String, String> params;
+
     protected int id;
 
     /**
@@ -41,12 +42,12 @@ public abstract class OkHttpRequestBuilder<T extends OkHttpRequestBuilder> {
      */
     protected boolean isShowToast = false;
 
-    public T isShowToast(boolean isShowToast){
+    public T isShowToast(boolean isShowToast) {
         this.isShowToast = isShowToast;
         return (T) this;
     }
 
-    public T isShowDialog(boolean isShowDialog){
+    public T isShowDialog(boolean isShowDialog) {
         this.isShowDialog = isShowDialog;
         return (T) this;
     }

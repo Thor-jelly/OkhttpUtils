@@ -26,8 +26,24 @@ public abstract class OkHttpRequest {
 
     protected Request.Builder builder = new Request.Builder();
 
-    protected OkHttpRequest(String url, Object tag,
-                            Map<String, String> params, Map<String, String> headers, int id, boolean isShowDialog, boolean isShowToast) {
+    /**
+     * get调用
+     */
+    protected OkHttpRequest(String url, Object tag, Map<String, String> headers, int id, boolean isShowDialog, boolean isShowToast) {
+        init(url, tag, null, headers, id, isShowDialog, isShowToast);
+    }
+
+    /**
+     * 参数是键值对格式
+     */
+    protected OkHttpRequest(String url, Object tag, Map<String, String> params, Map<String, String> headers, int id, boolean isShowDialog, boolean isShowToast) {
+        init(url, tag, params, headers, id, isShowDialog, isShowToast);
+    }
+
+    /**
+     * 初始化
+     */
+    private void init(String url, Object tag, Map<String, String> params, Map<String, String> headers, int id, boolean isShowDialog, boolean isShowToast) {
         this.url = url;
         this.tag = tag;
         this.params = params;

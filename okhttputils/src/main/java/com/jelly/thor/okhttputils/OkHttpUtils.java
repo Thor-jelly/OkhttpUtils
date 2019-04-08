@@ -5,6 +5,7 @@ import com.jelly.thor.okhttputils.builder.GetBuilder;
 import com.jelly.thor.okhttputils.builder.GetWebSocketBuilder;
 import com.jelly.thor.okhttputils.builder.PostFileBuilder;
 import com.jelly.thor.okhttputils.builder.PostFormBuilder;
+import com.jelly.thor.okhttputils.builder.PostStringBuilder;
 import com.jelly.thor.okhttputils.tag.TagBeen;
 
 import java.util.LinkedHashMap;
@@ -179,6 +180,13 @@ public class OkHttpUtils {
      */
     public static PostFormBuilder post() {
         return new PostFormBuilder();
+    }
+
+    /**
+     * post请求 json传递
+     */
+    public static PostStringBuilder postString() {
+        return new PostStringBuilder();
     }
 
     /**

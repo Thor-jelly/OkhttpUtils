@@ -29,6 +29,16 @@
         android:textSize="30dp" />
 
     <TextView
+        android:id="@+id/post_string_tv"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="10dp"
+        android:background="#f00"
+        android:gravity="center"
+        android:text="post_string请求"
+        android:textSize="30dp" />
+
+    <TextView
         android:id="@+id/socket_tv"
         android:layout_width="match_parent"
         android:layout_height="50dp"

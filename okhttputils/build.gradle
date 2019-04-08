@@ -7,8 +7,8 @@ android {
 //        applicationId "com.example.okhttputils"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.0.32"
+        versionCode 33
+        versionName "1.0.33"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -18,6 +18,11 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     //以下为配置library注释在打包jar后保留
@@ -44,9 +49,9 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.annotation:annotation:1.0.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'androidx.annotation:annotation:1.0.2'
+    implementation 'com.squareup.okhttp3:okhttp:3.14.0'
 }
 
 //apply plugin: 'maven'
