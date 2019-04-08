@@ -1,4 +1,4 @@
-[![GitHub release](https://img.shields.io/badge/release-v1.0.32-green.svg)](https://github.com/Thor-jelly/OkhttpUtils/releases)
+[![GitHub release](https://img.shields.io/badge/release-v1.0.33-green.svg)](https://github.com/Thor-jelly/OkhttpUtils/releases)
 
 > [OkHttp使用教程](http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2015/0106/2275.html)
 
@@ -14,7 +14,7 @@ Add it in your root build.gradle at the end of repositories:
 Step 2. Add the dependency
 
 	dependencies {
-	        implementation 'com.github.Thor-jelly:OkhttpUtils:v最新版本号'
+	        implementation 'com.github.Thor-jelly:OkhttpUtils:最新版本号'
 	}
 ```
 
@@ -146,6 +146,19 @@ m.put("name","wdd");
 m.put("pwd","123456");
 OkHttpUtils
      .post()
+     .url(url)
+     .params(m)//如果没有就不传
+     .build()
+```
+
+# post JSON请求
+
+```
+Map<String, String> m = new HashMap();
+m.put("name","wdd");
+m.put("pwd","123456");
+OkHttpUtils
+     .postString()
      .url(url)
      .params(m)//如果没有就不传
      .build()
