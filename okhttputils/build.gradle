@@ -50,8 +50,8 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.annotation:annotation:1.0.2'
-    implementation 'com.squareup.okhttp3:okhttp:3.14.0'
+    implementation 'androidx.annotation:annotation:1.1.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.14.1'
 }
 
 //apply plugin: 'maven'
