@@ -7,8 +7,8 @@ android {
 //        applicationId "com.example.okhttputils"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 35
-        versionName "1.0.35"
+        versionCode 36
+        versionName "1.1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -51,7 +51,7 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.annotation:annotation:1.1.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.14.1'
+    api 'com.squareup.okhttp3:okhttp:3.14.1'
 }
 
 //apply plugin: 'maven'
