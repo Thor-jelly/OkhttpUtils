@@ -84,8 +84,8 @@ public class MainActivity extends AppCompatActivity {
         mSocketTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //socketMethod();
-                testSocketMethod();
+                socketMethod();
+                //testSocketMethod();
             }
         });
 
@@ -226,7 +226,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void socketMethod() {
         OkHttpUtils.WebSocket()
-                .url("wss://ws.shandian.net:8082")
+                .url("wss://echo.websocket.org")
+//                .url("wss://ws.shandian.net:8082")
                 .newBuild()
                 .execute(new WebSocketListener() {
                     @Override
