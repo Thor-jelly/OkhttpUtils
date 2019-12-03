@@ -33,9 +33,28 @@ public class MyApplication extends Application {
                 .tlsVersions(TlsVersion.TLS_1_3,
                         TlsVersion.TLS_1_2)
                 .cipherSuites(
+                        // TLSv1.3.
+                        CipherSuite.TLS_AES_128_GCM_SHA256,
+                        CipherSuite.TLS_AES_256_GCM_SHA384,
+                        CipherSuite.TLS_CHACHA20_POLY1305_SHA256,
+
+                        // TLSv1.0, TLSv1.1, TLSv1.2.
                         CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
                         CipherSuite.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
-                        CipherSuite.TLS_DHE_RSA_WITH_AES_128_GCM_SHA256)
+                        CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+                        CipherSuite.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+                        CipherSuite.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
+                        CipherSuite.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
+
+                        // Note that the following cipher suites are all on HTTP/2's bad cipher suites list. We'll
+                        // continue to include them until better suites are commonly available.
+                        CipherSuite.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
+                        CipherSuite.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
+                        CipherSuite.TLS_RSA_WITH_AES_128_GCM_SHA256,
+                        CipherSuite.TLS_RSA_WITH_AES_256_GCM_SHA384,
+                        CipherSuite.TLS_RSA_WITH_AES_128_CBC_SHA,
+                        CipherSuite.TLS_RSA_WITH_AES_256_CBC_SHA,
+                        CipherSuite.TLS_RSA_WITH_3DES_EDE_CBC_SHA)
                 .build();
 
 //        ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.CLEARTEXT)
