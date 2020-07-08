@@ -15,6 +15,7 @@ import okio.Buffer;
 
 /**
  * 类描述：日志拦截器,网上搜索的一个<br/>
+ * 建议直接使用OkHttp的拦截器implementation("com.squareup.okhttp3:logging-interceptor:4.7.2")
  * 创建人：吴冬冬<br/>
  * 创建时间：2018/5/15 10:46 <br/>
  */
