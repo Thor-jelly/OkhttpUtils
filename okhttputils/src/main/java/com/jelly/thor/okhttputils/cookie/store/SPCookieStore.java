@@ -65,12 +65,16 @@ public class SPCookieStore implements CookieStore {
         return cookie.name() + "@" + cookie.domain();
     }
 
-    /** 当前cookie是否过期 */
+    /**
+     * 当前cookie是否过期
+     */
     private static boolean isCookieExpired(Cookie cookie) {
         return cookie.expiresAt() < System.currentTimeMillis();
     }
 
-    /** 将url的所有Cookie保存在本地 */
+    /**
+     * 将url的所有Cookie保存在本地
+     */
     @Override
     public synchronized void saveCookie(HttpUrl url, List<Cookie> urlCookies) {
         for (Cookie cookie : urlCookies) {
@@ -91,7 +95,9 @@ public class SPCookieStore implements CookieStore {
         }
     }
 
-    /** 保存cookie，并将cookies持久化到本地 */
+    /**
+     * 保存cookie，并将cookies持久化到本地
+     */
     private void saveCookie(HttpUrl url, Cookie cookie, String cookieToken) {
         //内存缓存
         cookies.get(url.host()).put(cookieToken, cookie);
@@ -102,7 +108,9 @@ public class SPCookieStore implements CookieStore {
         prefsWriter.apply();
     }
 
-    /** 根据当前url获取所有需要的cookie,只返回没有过期的cookie */
+    /**
+     * 根据当前url获取所有需要的cookie,只返回没有过期的cookie
+     */
     @Override
     public synchronized List<Cookie> loadCookie(HttpUrl url) {
         List<Cookie> ret = new ArrayList<>();
@@ -119,7 +127,9 @@ public class SPCookieStore implements CookieStore {
         return ret;
     }
 
-    /** 根据url移除当前的cookie */
+    /**
+     * 根据url移除当前的cookie
+     */
     @Override
     public synchronized boolean removeCookie(HttpUrl url, Cookie cookie) {
         if (!cookies.containsKey(url.host())) return false;
@@ -169,7 +179,9 @@ public class SPCookieStore implements CookieStore {
         return true;
     }
 
-    /** 获取所有的cookie */
+    /**
+     * 获取所有的cookie
+     */
     @Override
     public synchronized List<Cookie> getAllCookie() {
         List<Cookie> ret = new ArrayList<>();
