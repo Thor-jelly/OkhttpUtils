@@ -6,20 +6,32 @@ import okhttp3.Cookie;
 import okhttp3.HttpUrl;
 
 /**
- * 类描述：cookie 通用方法接口<br/>
  * 创建人：吴冬冬<br/>
- * 创建时间：2018/5/15 10:59 <br/>
+ * 创建时间：2021/3/8 14:46 <br/>
  */
 public interface CookieStore {
 
-    void add(HttpUrl uri, List<Cookie> cookie);
+    /** 保存url对应所有cookie */
+    void saveCookie(HttpUrl url, List<Cookie> cookie);
 
-    List<Cookie> get(HttpUrl uri);
+    /** 保存url对应所有cookie */
+    void saveCookie(HttpUrl url, Cookie cookie);
 
-    List<Cookie> getCookies();
+    /** 加载url所有的cookie */
+    List<Cookie> loadCookie(HttpUrl url);
 
-    boolean remove(HttpUrl uri, Cookie cookie);
+    /** 获取当前所有保存的cookie */
+    List<Cookie> getAllCookie();
 
-    boolean removeAll();
+    /** 获取当前url对应的所有的cookie */
+    List<Cookie> getCookie(HttpUrl url);
 
+    /** 根据url和cookie移除对应的cookie */
+    boolean removeCookie(HttpUrl url, Cookie cookie);
+
+    /** 根据url移除所有的cookie */
+    boolean removeCookie(HttpUrl url);
+
+    /** 移除所有的cookie */
+    boolean removeAllCookie();
 }

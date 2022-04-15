@@ -19,6 +19,7 @@ import okio.Buffer;
  * 创建人：吴冬冬<br/>
  * 创建时间：2018/5/15 10:46 <br/>
  */
+@Deprecated
 public class LoggerInterceptor implements Interceptor {
     private static final String TAG = "OkHttpUtils";
     private String tag;
@@ -92,6 +93,7 @@ public class LoggerInterceptor implements Interceptor {
                             int segmentSize = 3 * 1024;
                             long length = s.length();
                             if (length <= segmentSize) {// 长度小于等于限制直接打印
+
                                 Log.d(tag, "responseBody's content : " + s);
                             } else {
                                 int currentInt = 0;
