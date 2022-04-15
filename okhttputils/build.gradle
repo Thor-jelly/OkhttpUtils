@@ -1,14 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 31
 
     defaultConfig {
 //        applicationId "com.example.okhttputils"
         minSdkVersion 19
-        targetSdkVersion 28
-        versionCode 36
-        versionName "1.1.0"
+        targetSdkVersion 31
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -28,14 +26,14 @@ android {
     //以下为配置library注释在打包jar后保留
     // 打包源码jar
     task sourcesJar(type: Jar) {
-        from android.sourceSets.main.java.srcDirs
         classifier = 'sources'
+        from android.sourceSets.main.java.srcDirs
     }
     task javadoc(type: Javadoc) {
         failOnError false
         source = android.sourceSets.main.java.sourceFiles
         classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-        classpath += configurations.compile
+        //classpath += configurations.compile
     }
     // 打包文档jar
     task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -50,8 +48,8 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.annotation:annotation:1.1.0'
-    api 'com.squareup.okhttp3:okhttp:4.2.0'
+    implementation 'androidx.annotation:annotation:1.3.0'
+    api 'com.squareup.okhttp3:okhttp:5.0.0-alpha.2'
 }
 
 //apply plugin: 'maven'
