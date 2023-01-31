@@ -2,6 +2,9 @@ package com.jelly.thor.okhttputils.callback;
 
 import android.widget.Toast;
 
+import androidx.annotation.MainThread;
+import androidx.annotation.WorkerThread;
+
 import com.jelly.thor.okhttputils.request.OkHttpRequest;
 import com.jelly.thor.okhttputils.utils.CommontUtils;
 import com.jelly.thor.okhttputils.utils.GetApplication;
@@ -9,8 +12,6 @@ import com.jelly.thor.okhttputils.utils.LoadDialogUtil;
 
 import java.util.Map;
 
-import androidx.annotation.MainThread;
-import androidx.annotation.WorkerThread;
 import okhttp3.Response;
 
 /**
@@ -31,8 +32,6 @@ public abstract class Callback<T> {
             Toast.makeText(GetApplication.get().getApplicationContext(), errorMessage, Toast.LENGTH_LONG).show();
         }
     }
-
-    ;
 
     /**
      * 主线程中

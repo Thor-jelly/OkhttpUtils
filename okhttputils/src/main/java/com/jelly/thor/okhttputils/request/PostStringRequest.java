@@ -1,5 +1,7 @@
 package com.jelly.thor.okhttputils.request;
 
+import android.text.TextUtils;
+
 import com.jelly.thor.okhttputils.OkHttpUtils;
 
 import org.json.JSONArray;
@@ -19,12 +21,18 @@ import okhttp3.RequestBody;
 public class PostStringRequest extends OkHttpRequest {
     private static final MediaType NOW_MEDIA_TYPE = MediaType.parse("application/json; charset=utf-8");
 
-    public PostStringRequest(String url, Object tag, Map<String, String> params, Map<String, String> headers, int id, boolean isShowDialog, boolean isShowToast) {
+    private final String strParams;
+
+    public PostStringRequest(String url, Object tag, String strParams, Map<String, String> params, Map<String, String> headers, int id, boolean isShowDialog, boolean isShowToast) {
         super(url, tag, params, headers, id, isShowDialog, isShowToast);
+        this.strParams = strParams;
     }
 
     @Override
     protected RequestBody requestBody() {
+        if (!TextUtils.isEmpty(strParams)) {
+            return RequestBody.create(strParams, NOW_MEDIA_TYPE);
+        }
         JSONObject jsonObject = new JSONObject();
         //添加请求参数
         addRequestParams(jsonObject, params);

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Build;
 import android.webkit.WebSettings;
 
+import com.jelly.thor.example.netserver.ParseDataImpl;
 import com.jelly.thor.okhttputils.OkHttpUtils;
 import com.jelly.thor.okhttputils.https.HttpsUtils;
 import com.jelly.thor.okhttputils.log.LoggerInterceptor;
@@ -29,36 +30,36 @@ public class MyApplication extends Application {
 
         //下面代码看https://github.com/square/okhttp/wiki/HTTPS
         //https用ConnectionSpec.MODERN_TLS，不是的就用ConnectionSpec.CLEARTEXT
-        ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
-                .tlsVersions(TlsVersion.TLS_1_3,
-                        TlsVersion.TLS_1_2)
-                .cipherSuites(
-                        // TLSv1.3.
-                        CipherSuite.TLS_AES_128_GCM_SHA256,
-                        CipherSuite.TLS_AES_256_GCM_SHA384,
-                        CipherSuite.TLS_CHACHA20_POLY1305_SHA256,
-
-                        // TLSv1.0, TLSv1.1, TLSv1.2.
-                        CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
-                        CipherSuite.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
-                        CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
-                        CipherSuite.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-                        CipherSuite.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
-                        CipherSuite.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
-
-                        // Note that the following cipher suites are all on HTTP/2's bad cipher suites list. We'll
-                        // continue to include them until better suites are commonly available.
-                        CipherSuite.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
-                        CipherSuite.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
-                        CipherSuite.TLS_RSA_WITH_AES_128_GCM_SHA256,
-                        CipherSuite.TLS_RSA_WITH_AES_256_GCM_SHA384,
-                        CipherSuite.TLS_RSA_WITH_AES_128_CBC_SHA,
-                        CipherSuite.TLS_RSA_WITH_AES_256_CBC_SHA,
-                        CipherSuite.TLS_RSA_WITH_3DES_EDE_CBC_SHA)
-                .build();
-
-//        ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.CLEARTEXT)
+//        ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+//                .tlsVersions(TlsVersion.TLS_1_3,
+//                        TlsVersion.TLS_1_2)
+//                .cipherSuites(
+//                        // TLSv1.3.
+//                        CipherSuite.TLS_AES_128_GCM_SHA256,
+//                        CipherSuite.TLS_AES_256_GCM_SHA384,
+//                        CipherSuite.TLS_CHACHA20_POLY1305_SHA256,
+//
+//                        // TLSv1.0, TLSv1.1, TLSv1.2.
+//                        CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+//                        CipherSuite.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+//                        CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+//                        CipherSuite.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+//                        CipherSuite.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
+//                        CipherSuite.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
+//
+//                        // Note that the following cipher suites are all on HTTP/2's bad cipher suites list. We'll
+//                        // continue to include them until better suites are commonly available.
+//                        CipherSuite.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
+//                        CipherSuite.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
+//                        CipherSuite.TLS_RSA_WITH_AES_128_GCM_SHA256,
+//                        CipherSuite.TLS_RSA_WITH_AES_256_GCM_SHA384,
+//                        CipherSuite.TLS_RSA_WITH_AES_128_CBC_SHA,
+//                        CipherSuite.TLS_RSA_WITH_AES_256_CBC_SHA,
+//                        CipherSuite.TLS_RSA_WITH_3DES_EDE_CBC_SHA)
 //                .build();
+
+        ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.CLEARTEXT)
+                .build();
 
         HttpsUtils.SSLParams sslParams = HttpsUtils.getSslSocketFactory(null, null, null);
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
@@ -71,7 +72,7 @@ public class MyApplication extends Application {
                 .hostnameVerifier(new HttpsUtils.UnSafeHostnameVerifier())
                 .build();
 
-        OkHttpUtils.initClient(okHttpClient);
+        OkHttpUtils.initClient(okHttpClient, new ParseDataImpl());
 
         //OkHttpUtils.getInstance().setBaseUrl("https://b.shandian.net/pos/");
         LinkedHashMap<String, String> m = new LinkedHashMap<>();

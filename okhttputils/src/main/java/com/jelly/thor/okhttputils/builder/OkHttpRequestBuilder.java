@@ -1,5 +1,9 @@
 package com.jelly.thor.okhttputils.builder;
 
+import android.text.TextUtils;
+import android.webkit.URLUtil;
+
+import com.jelly.thor.okhttputils.OkHttpUtils;
 import com.jelly.thor.okhttputils.request.RequestCall;
 
 import java.util.Map;
@@ -74,4 +78,27 @@ public abstract class OkHttpRequestBuilder<T extends OkHttpRequestBuilder> {
     }
 
     public abstract RequestCall build();
+
+    /**
+     * 网络请求域名拼接生成新的url
+     */
+    protected String getNewUrl() {
+        String newUrl;
+        if (!TextUtils.isEmpty(baseUrl)) {
+            if (URLUtil.isValidUrl(url)) {
+                newUrl = url;
+            } else {
+                newUrl = baseUrl + url;
+            }
+        } else if (!TextUtils.isEmpty(OkHttpUtils.getInstance().getBaseUrl())) {
+            if (URLUtil.isValidUrl(url)) {
+                newUrl = url;
+            } else {
+                newUrl = OkHttpUtils.getInstance().getBaseUrl() + url;
+            }
+        } else {
+            newUrl = url;
+        }
+        return newUrl;
+    }
 }

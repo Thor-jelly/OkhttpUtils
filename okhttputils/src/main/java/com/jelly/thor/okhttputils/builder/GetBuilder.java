@@ -21,22 +21,9 @@ import androidx.annotation.NonNull;
 public class GetBuilder extends OkHttpRequestBuilder<GetBuilder> implements HasParamsable, HasHeadersable {
     @Override
     public RequestCall build() {
-        String myUrl;
-        if (baseUrl != null) {
-            if (URLUtil.isValidUrl(url)) {
-                myUrl = url;
-            } else {
-                myUrl = baseUrl + url;
-            }
-        } else if (OkHttpUtils.getInstance().getBaseUrl() != null) {
-            if (URLUtil.isValidUrl(url)) {
-                myUrl = url;
-            } else {
-                myUrl = OkHttpUtils.getInstance().getBaseUrl() + url;
-            }
-        } else {
-            myUrl = url;
-        }
+        //处理请求
+        String myUrl = getNewUrl();
+        //设置公用请求参数
         Map<String, String> commonParams = OkHttpUtils.getInstance().getCommonParams();
         if (params != null) {
             if (commonParams != null && !commonParams.isEmpty()) {
@@ -70,7 +57,7 @@ public class GetBuilder extends OkHttpRequestBuilder<GetBuilder> implements HasP
     @Override
     public GetBuilder params(@NonNull Map<String, String> params) {
         if (this.params == null) {
-            params = new LinkedHashMap<>();
+            this.params = new LinkedHashMap<>();
         }
         this.params.putAll(params);
         return this;
@@ -79,7 +66,7 @@ public class GetBuilder extends OkHttpRequestBuilder<GetBuilder> implements HasP
     @Override
     public GetBuilder addParam(@NonNull String key, @NonNull String value) {
         if (this.params == null) {
-            params = new LinkedHashMap<>();
+            this.params = new LinkedHashMap<>();
         }
         params.put(key, value);
         return this;

@@ -1,17 +1,20 @@
 package com.jelly.thor.okhttputils;
 
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.jelly.thor.okhttputils.builder.GetBuilder;
 import com.jelly.thor.okhttputils.builder.GetWebSocketBuilder;
 import com.jelly.thor.okhttputils.builder.PostFileBuilder;
 import com.jelly.thor.okhttputils.builder.PostFormBuilder;
 import com.jelly.thor.okhttputils.builder.PostStringBuilder;
+import com.jelly.thor.okhttputils.callback.IParseData;
 import com.jelly.thor.okhttputils.tag.TagBeen;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import androidx.annotation.NonNull;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
 
@@ -30,6 +33,14 @@ public class OkHttpUtils {
     private Map<String, String> mCommonParams;
     private Map<String, String> mCommonHeaders;
 
+    /**
+     * 数据解析类
+     */
+    private IParseData mIParseData;
+
+    private OkHttpUtils() {
+    }
+
     private OkHttpUtils(OkHttpClient okHttpClient) {
         if (okHttpClient == null) {
             mOkHttpClient = new OkHttpClient();
@@ -38,11 +49,19 @@ public class OkHttpUtils {
         }
     }
 
-    public static OkHttpUtils initClient(@NonNull OkHttpClient okHttpClient) {
+    public static OkHttpUtils initClient(@Nullable OkHttpClient okHttpClient) {
+        return initClient(okHttpClient, null);
+    }
+
+    /**
+     * 在Application中初始化 网络
+     */
+    public static OkHttpUtils initClient(@Nullable OkHttpClient okHttpClient, @Nullable IParseData iParseData) {
         if (mInstance == null) {
             synchronized (OkHttpUtils.class) {
                 if (mInstance == null) {
                     mInstance = new OkHttpUtils(okHttpClient);
+                    mInstance.setIParseData(iParseData);
                 }
             }
         }
@@ -61,6 +80,17 @@ public class OkHttpUtils {
             throw new Error("请先在Application中初始化OkHttpClient, 调用OkHttpUtils.getInstance()或者OkHttpUtils.initClient()方法!");
         }
         return mOkHttpClient;
+    }
+
+    public void setIParseData(IParseData iParseData) {
+        this.mIParseData = iParseData;
+    }
+
+    public IParseData getParseData() {
+        if (mIParseData == null) {
+            throw new Error("请先在Application中初始化OkHttpClient, 调用OkHttpUtils.getInstance().setIParseData()或者OkHttpUtils.initClient()方法!");
+        }
+        return mIParseData;
     }
 
     /**
@@ -156,7 +186,7 @@ public class OkHttpUtils {
                 if (tag.equals(saveTag)) {
                     call.cancel();
                 }
-            } else if (!tagIsString && !saveTagIsString){
+            } else if (!tagIsString && !saveTagIsString) {
                 if (tag == saveTag) {
                     call.cancel();
                 }

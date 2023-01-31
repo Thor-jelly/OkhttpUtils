@@ -17,6 +17,15 @@ import androidx.annotation.NonNull;
  * 创建时间：2018/5/14 17:54 <br/>
  */
 public class PostStringBuilder extends OkHttpRequestBuilder<PostStringBuilder> implements HasParamsable, HasHeadersable {
+    //工具类外转换完直接可以用的json
+    private String strParams;
+
+    //json 所有参数，设置完其他添加参数方法失效
+    public PostStringBuilder params(@NonNull String strParams) {
+        this.strParams = strParams;
+        return this;
+    }
+
     @Override
     public PostStringBuilder params(@NonNull Map<String, String> params) {
         if (this.params == null) {
@@ -55,22 +64,7 @@ public class PostStringBuilder extends OkHttpRequestBuilder<PostStringBuilder> i
 
     @Override
     public RequestCall build() {
-        String myUrl;
-        if (baseUrl != null) {
-            if (URLUtil.isValidUrl(url)) {
-                myUrl = url;
-            } else {
-                myUrl = baseUrl + url;
-            }
-        } else if (OkHttpUtils.getInstance().getBaseUrl() != null) {
-            if (URLUtil.isValidUrl(url)) {
-                myUrl = url;
-            } else {
-                myUrl = OkHttpUtils.getInstance().getBaseUrl() + url;
-            }
-        } else {
-            myUrl = url;
-        }
-        return new PostStringRequest(myUrl, tag, params, headers, id, isShowDialog, isShowToast).build();
+        String myUrl = getNewUrl();
+        return new PostStringRequest(myUrl, tag, strParams, params, headers, id, isShowDialog, isShowToast).build();
     }
 }

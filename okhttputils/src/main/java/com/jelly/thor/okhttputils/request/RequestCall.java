@@ -1,29 +1,30 @@
 package com.jelly.thor.okhttputils.request;
 
-import android.util.Log;
+import android.text.TextUtils;
 
-import com.jelly.thor.okhttputils.BuildConfig;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.jelly.thor.okhttputils.OkHttpUtils;
 import com.jelly.thor.okhttputils.callback.Callback;
+import com.jelly.thor.okhttputils.callback.ParseDataUtils;
 import com.jelly.thor.okhttputils.utils.CommontUtils;
 import com.jelly.thor.okhttputils.utils.ErrorCode;
 import com.jelly.thor.okhttputils.utils.Platform;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.jushuitan.jht.basemodule.utils.net.exception.ResponseException;
+import com.jushuitan.jht.basemodule.utils.net.exception.ServerException;
 
 import java.io.IOException;
 import java.util.Map;
 
-import androidx.annotation.NonNull;
+import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.MaybeEmitter;
+import io.reactivex.rxjava3.core.MaybeOnSubscribe;
 import okhttp3.Call;
-import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 /**
  * 类描述：网络请求<br/>
@@ -31,7 +32,7 @@ import okhttp3.ResponseBody;
  * 创建时间：2018/5/15 17:27 <br/>
  */
 public class RequestCall {
-    private OkHttpRequest mOkHttpRequest;
+    private final OkHttpRequest mOkHttpRequest;
     private Request mRequest;
     private Call mCall;
 
@@ -39,23 +40,56 @@ public class RequestCall {
         this.mOkHttpRequest = okHttpRequest;
     }
 
-    public void execute(final Callback callback) {
-        callback.mOkHttpRequest = mOkHttpRequest;
+    /**
+     * rxJava模式
+     */
+    public Maybe<Response> getRxJava() {
+        return Maybe.create(new MaybeOnSubscribe<Response>() {
+            @Override
+            public void subscribe(@NonNull MaybeEmitter<Response> emitter) throws Throwable {
+                if (emitter.isDisposed()) {
+                    return;
+                }
+                execute(emitter, null);
+            }
+        });
+    }
+
+    /**
+     * java模式
+     */
+    public <T> void execute(Callback<T> callback) {
+        execute(null, callback);
+    }
+
+    private <T> void execute(@Nullable MaybeEmitter<Response> emitter, @Nullable Callback<T> callback) {
         //判断是否有网络
         boolean isNet = CommontUtils.networkAvailable();
         if (!isNet) {
-            //失败回调 主线程中
-            sendOkHttpFail(mOkHttpRequest.getId(), ErrorCode.RESPONSE_NET, "当前没有网络！", callback);
+            String errorStr = "当前没有网络！";
+            if (emitter == null) {
+                callback.mOkHttpRequest = mOkHttpRequest;
+                //失败回调 主线程中
+                sendOkHttpFail(mOkHttpRequest.id, ErrorCode.NET_ERROR, errorStr, callback);
+            } else {
+                if (emitter.isDisposed()) {
+                    return;
+                }
+                emitter.onError(new ServerException(ErrorCode.NET_ERROR, errorStr));
+            }
             return;
         }
 
         //回调通知开始
-        Platform.get().execute(new Runnable() {
-            @Override
-            public void run() {
-                callback.onBefore(mOkHttpRequest.getId());
-            }
-        });
+        if (callback != null) {
+            callback.mOkHttpRequest = mOkHttpRequest;
+            Platform.get().execute(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onBefore(mOkHttpRequest.getId());
+                }
+            });
+        }
 
         OkHttpClient okHttpClient = OkHttpUtils.getInstance().getOkHttpClient();
 
@@ -63,12 +97,12 @@ public class RequestCall {
             mRequest = mOkHttpRequest.getRequest();
         } catch (IllegalArgumentException e) {
             //失败回调 主线程中
-            sendOkHttpFail(mOkHttpRequest.getId(), ErrorCode.REQUEST_PARAMS_EXCEPTION, mRequest.url().toString() + "添加参数异常 " + e.getMessage(), callback);
+            sendOkHttpFail(mOkHttpRequest.getId(), ErrorCode.PARAMS_EXCEPTION, mRequest.url().toString() + "添加参数异常 " + e.getMessage(), callback);
             return;
         }
 
         //动态追加的公共参数
-        Map<String, String> changeCommonParameters = callback.addChangeCommonParameters();
+        Map<String, String> changeCommonParameters = callback == null ? null : callback.addChangeCommonParameters();
         if (changeCommonParameters != null && !changeCommonParameters.isEmpty()) {
             String method = mRequest.method();
 //            switch (method) {
@@ -103,7 +137,7 @@ public class RequestCall {
                 String key = entry.getKey();
                 String value = entry.getValue();
                 if (value == null) {
-                    sendOkHttpFail(mOkHttpRequest.getId(), ErrorCode.REQUEST_PARAMS_EXCEPTION, mRequest.url().toString() + "addChangeCommonParameters参数异常 " + "参数中的" + key + " 赋值为null", callback);
+                    sendOkHttpFail(mOkHttpRequest.getId(), ErrorCode.PARAMS_EXCEPTION, mRequest.url().toString() + "addChangeCommonParameters参数异常 " + "参数中的" + key + " 赋值为null", callback);
                     return;
                 }
                 newUrl.addQueryParameter(key, value);
@@ -122,94 +156,125 @@ public class RequestCall {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 //在子线程中
-                if (BuildConfig.DEBUG) {
-                    Log.d("OkHttpUtils", mOkHttpRequest.getId() + "-OkHttp3--->>>onFailure: " + (e == null ? "IOException 为null" : e.toString()));
-                    Log.d("OkHttpUtils", mOkHttpRequest.getId() + "-OkHttp3--->>>onFailure: 当前网络是否被被取消=" + call.isCanceled());
-                }
+//                if (BuildConfig.DEBUG) {
+//                    Log.d("OkHttpUtils", mOkHttpRequest.getId() + "-OkHttp3--->>>onFailure: " + (e == null ? "IOException 为null" : e.toString()));
+//                    Log.d("OkHttpUtils", mOkHttpRequest.getId() + "-OkHttp3--->>>onFailure: 当前网络是否被被取消=" + call.isCanceled());
+//                }
                 if (!call.isCanceled()) {
                     call.cancel();
                 }
                 //失败回调 主线程中
-                sendOkHttpFail(mOkHttpRequest.getId(), ErrorCode.RESPONSE_NET, "网络异常！", callback);
+                sendOkHttpFail(mOkHttpRequest.getId(), ErrorCode.NET_ERROR, "网络异常！", callback);
             }
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) {
-                final int id = mOkHttpRequest.getId();
+                final int id = mOkHttpRequest.id;
                 //在子线程中
                 if (call.isCanceled()) {
-                    //失败回调 主线程中
-                    sendOkHttpFail(id, ErrorCode.RESPONSE_NET_CANCEL, "网络被取消！", callback);
+                    String errorStr = "网络被取消！";
+                    if (emitter == null) {
+                        //失败回调 主线程中
+                        sendOkHttpFail(id, ErrorCode.NET_CANCEL, errorStr, callback);
+                    } else {
+                        if (emitter.isDisposed()) {
+                            return;
+                        }
+                        emitter.onError(new ServerException(ErrorCode.NET_CANCEL, errorStr));
+                    }
                     return;
                 }
                 if (!response.isSuccessful()) {
                     int code = response.code();
                     String errorStr = response.message();
-                    //失败回调 主线程中
-                    sendOkHttpFail(id, code, errorStr, callback);
+                    if (TextUtils.isEmpty(errorStr)) {
+                        errorStr = response.toString();
+                    }
+                    if (emitter == null) {
+                        //失败回调 主线程中
+                        sendOkHttpFail(id, code, errorStr, callback);
+                    } else {
+                        if (emitter.isDisposed()) {
+                            return;
+                        }
+                        emitter.onError(new ServerException(code, errorStr));
+                    }
                     return;
                 }
 
-                Object o = null;
-                try {
-                    //数据解析需要在子线程
-                    o = callback.parseNetworkResponse(response, id, mOkHttpRequest);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    //失败回调 主线程中
-                    sendOkHttpFail(id, ErrorCode.RESPONSE_NULL, "返回response异常,网址为：" + mRequest.url().toString(), callback);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    //失败回调 主线程中
-                    sendOkHttpFail(id, ErrorCode.RESPONSE_OBJ, "数据解析异常，地址为：" + mRequest.url().toString(), callback);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //失败回调 主线程中
-                    sendOkHttpFail(id, ErrorCode.RESPONSE_ERROR, e.toString() + "，地址为：" + mRequest.url().toString(), callback);
-                } finally {
-                    ResponseBody body = response.body();
-                    if (body != null) {
-                        body.close();
-                    }
-                }
+                if (emitter == null) {
+                    Object o = null;
+                    try {
+                        //数据解析需要在子线程
+                        o = callback.parseNetworkResponse(response, id, mOkHttpRequest);
+                    } catch (Exception e) {
+                        //e.printStackTrace();
+                        ResponseException responseException = ParseDataUtils.handleError(e, response.request());
+                        //失败回调 主线程中
+                        sendOkHttpFail(id, responseException.getCode(), responseException.getMessage(), callback);
+                    } /*finally {
+                        ResponseBody body = response.body();
+                        if (body != null) {
+                            body.close();
+                        }
+                    }*/
 
-                //如果自定义没有返回null，如果返回null表示不需要执行成功回调onResponse onAfter
-                //主线程中
-                if (o != null) {
-                    sendOkHttpSuccess(id, o, callback);
+                    //如果自定义没有返回null，如果返回null表示不需要执行成功回调onResponse onAfter
+                    //主线程中
+                    if (o != null) {
+                        sendOkHttpSuccess(id, o, response.request(), callback);
+                    } else {
+                        sendOkHttpAfter(id, callback);
+                    }
                 } else {
-                    sendOkHttpAfter(id, callback);
+                    if (emitter.isDisposed()) {
+                        return;
+                    }
+                    emitter.onSuccess(response);
                 }
             }
         });
     }
 
-    private void sendOkHttpAfter(final int id, final Callback callback) {
+    private <T> void sendOkHttpAfter(final int id, final Callback<T> callback) {
         Platform.get().execute(new Runnable() {
             @Override
             public void run() {
+                if (callback == null) {
+                    return;
+                }
                 callback.onAfter(id);
             }
         });
     }
 
-    private void sendOkHttpFail(final int id, final int code, final String errorStr, final Callback callback) {
+    private <T> void sendOkHttpFail(final int id, final int code, final String errorStr, final Callback<T> callback) {
         Platform.get().execute(new Runnable() {
             @Override
             public void run() {
+                if (callback == null) {
+                    return;
+                }
                 callback.onError(code, errorStr, id, mOkHttpRequest);
                 callback.onAfter(id);
             }
         });
     }
 
-    private void sendOkHttpSuccess(final int id, final Object o, final Callback callback) {
+    private <T> void sendOkHttpSuccess(int id, Object o, Request request, Callback<T> callback) {
         //下面两个方法需要转换到主线程
         //解析完成的数据
         Platform.get().execute(new Runnable() {
             @Override
             public void run() {
-                callback.onResponse(0, o, id);
+                if (callback == null) {
+                    return;
+                }
+                try {
+                    callback.onResponse(0, (T) o, id);
+                } catch (Exception e) {
+                    sendOkHttpFail(id, ErrorCode.HANDLE_SUCCESS_ERROR, "在处理数据中失败：" + e.getMessage(), callback);
+                }
                 //完成
                 callback.onAfter(id);
             }
