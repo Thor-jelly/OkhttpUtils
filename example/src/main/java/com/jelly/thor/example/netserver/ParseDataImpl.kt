@@ -1,6 +1,8 @@
 package com.jelly.thor.example.netserver
 
 import android.net.ParseException
+import com.alibaba.fastjson.JSON
+import com.alibaba.fastjson.TypeReference
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
 import com.jelly.thor.okhttputils.callback.IParseData
@@ -16,6 +18,7 @@ import org.json.JSONException
 import java.lang.reflect.ParameterizedType
 import java.net.ConnectException
 import java.net.SocketTimeoutException
+import java.nio.charset.Charset
 import javax.net.ssl.SSLHandshakeException
 
 /**
@@ -30,11 +33,7 @@ class ParseDataImpl : IParseData {
         parameterizedTypeImpl: ParameterizedType?
     ): T {
         //是否需要转换数据
-        val isDataConversion =
-            (clazz != null && response.javaClass != clazz) || parameterizedTypeImpl != null
-        if (!isDataConversion) {
-            return response as T
-        }
+        val isDataConversion = (clazz != null && response.javaClass != clazz) || parameterizedTypeImpl != null
         //网络请求码错误
         if (!response.isSuccessful) {
             throw ServerException(ErrorCode.NET_ERROR, "服务器请求失败！")
@@ -43,38 +42,34 @@ class ParseDataImpl : IParseData {
         if (response.body == null) {
             throw ServerException(ErrorCode.NET_ERROR, "服务器请求失败！")
         }
-        val responseStr = /*if (isDataConversion) {*/
+        val responseStr = if (isDataConversion) {
             response.body!!.string()
-//        } else {
-//            val source = response.body!!.source()
-//            source.request(Long.MAX_VALUE)
-//            source.buffer.clone().readString(Charset.defaultCharset())
-//        }
+        } else {
+            val source = response.body!!.source()
+            source.request(Long.MAX_VALUE)
+            source.buffer.clone().readString(Charset.defaultCharset())
+        }
         if (responseStr.contains("\"code\"")) {
             //返回
             val model = if (parameterizedTypeImpl != null) {
                 try {
                     //fastjson写法
-                    //JSON.parseObject(responseStr, parameterizedTypeImpl) as ResponseModel<*>
-//                    Gson().fromJson<ResponseModel<List<RxJavaTestCModel>>>(responseStr, object :TypeToken<ResponseModel<List<RxJavaTestCModel>>>(){}.type)
-                    Gson().fromJson<ResponseModel<T>>(responseStr, parameterizedTypeImpl as GsonTypes.ParameterizedTypeImpl)
+                    JSON.parseObject(responseStr, parameterizedTypeImpl) as ResponseModel<*>
+//                    Gson().fromJson<ResponseModel<T>>(responseStr, parameterizedTypeImpl as GsonTypes.ParameterizedTypeImpl)
                 } catch (e: Exception) {
                     throw ResponseException(ErrorCode.PARSE_ERROR, e, "解析错误")
                 }
             } else {
                 try {
                     //fastjson写法
-//                    JSON.parseObject(
-//                        responseStr,
-//                        object : TypeReference<ResponseModel<T>>(clazz) {}) as ResponseModel<T>
-                    //gson
-//                    val jsonType = object : TypeToken<ResponseModel<T>>() {}.type
-//                    val fromJson = Gson().fromJson<ResponseModel<T>>(responseStr, jsonType)
-                    val fromJson = Gson().fromJson<ResponseModel<T>>(
+                    JSON.parseObject(
                         responseStr,
-                        GsonTypes.ParameterizedTypeImpl(null, ResponseModel::class.java, clazz)
-                    )
-                    fromJson
+                        object : TypeReference<ResponseModel<T>>(clazz) {}) as ResponseModel<T>
+                    //gson
+//                    val fromJson = Gson().fromJson<ResponseModel<T>>(
+//                        responseStr,
+//                        GsonTypes.ParameterizedTypeImpl(null, ResponseModel::class.java, clazz)
+//                    )
                 } catch (e: Exception) {
                     throw ResponseException(ErrorCode.PARSE_ERROR, e, "解析错误")
                 }
@@ -110,6 +105,7 @@ class ParseDataImpl : IParseData {
 //                }
                 it
             }
+
             is ServerException -> {
                 if (request != null) {
 //                    NetPointEvent.addRequestBieErrorEvent(
@@ -126,6 +122,7 @@ class ParseDataImpl : IParseData {
                 responseException
 //                }
             }
+
             is JsonParseException,
             is JSONException,
             is ParseException -> {
@@ -138,6 +135,7 @@ class ParseDataImpl : IParseData {
                 }
                 ResponseException(ErrorCode.PARSE_ERROR, it, "解析错误")
             }
+
             is ConnectException -> {
                 if (request != null) {
 //                    NetPointEvent.addRequestErrorEvent(
@@ -148,6 +146,7 @@ class ParseDataImpl : IParseData {
                 }
                 ResponseException(ErrorCode.NET_ERROR, it, "连接失败")
             }
+
             is SSLHandshakeException -> {
                 if (request != null) {
 //                    NetPointEvent.addRequestErrorEvent(
@@ -158,6 +157,7 @@ class ParseDataImpl : IParseData {
                 }
                 ResponseException(ErrorCode.SSL_ERROR, it, "证书验证失败")
             }
+
             is ConnectTimeoutException,
             is SocketTimeoutException -> {
                 if (request != null) {

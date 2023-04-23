@@ -1,17 +1,17 @@
 package com.jelly.thor.okhttputils.callback
 
 import android.net.Uri
-import com.jelly.thor.okhttputils.model.ResponseModel
+import com.jelly.thor.okhttputils.converters.IRefParamsType
+import com.jelly.thor.okhttputils.converters.RefParamsType
+import com.jelly.thor.okhttputils.converters.fastjson.FastJsonResponseBodyConverter
 import com.jelly.thor.okhttputils.utils.ErrorCode
 import com.jelly.thor.okhttputils.utils.GetApplication
-import com.jelly.thor.okhttputils.utils.GsonTypes
 import com.jelly.thor.okhttputils.utils.file.save2File
 import com.jushuitan.jht.basemodule.utils.net.exception.ServerException
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.schedulers.Schedulers
 import okhttp3.Request
 import okhttp3.Response
-import java.lang.reflect.ParameterizedType
 
 
 /**
@@ -24,55 +24,20 @@ import java.lang.reflect.ParameterizedType
  */
 inline fun <reified T : Any> Maybe<Response>.dataConversion(
     id: Int = 0,
-    p: RefParamsType<T> = object : RefParamsType<T>() {}
+    p: IRefParamsType<T> = object : RefParamsType<T>() {}
 ): Maybe<T> {
     var request: Request? = null
     return this.map {
         request = it.request
-        val genericSuperclass = p.javaClass.genericSuperclass
-        if (genericSuperclass !is ParameterizedType) {
-            return@map ParseDataUtils.parseData<T>(id, it, T::class.java)
-        }
-        val actualTypeArguments = genericSuperclass.actualTypeArguments
-        if (actualTypeArguments.isEmpty()) {
-            return@map ParseDataUtils.parseData<T>(id, it, T::class.java)
-        }
-        val type = actualTypeArguments[0]
-        if (type !is ParameterizedType) {
-            return@map ParseDataUtils.parseData<T>(id, it, T::class.java)
-        }
-        if (ResponseModel::class.java.canonicalName == (type.rawType as Class<*>).canonicalName) {
-            val getPTypeImpl = GsonTypes.ParameterizedTypeImpl(
-                type.ownerType,
-                type.rawType,
-                *type.actualTypeArguments
-            )
-            return@map ParseDataUtils.parseData(id, it, T::class.java, getPTypeImpl)
-        } else {
-            val inTypeParamsImpl = GsonTypes.ParameterizedTypeImpl(
-                type.ownerType,
-                type.rawType,
-                *type.actualTypeArguments
-            )
-            val outTypeParamsImpl = GsonTypes.ParameterizedTypeImpl(
-                null,
-                ResponseModel::class.java,
-                *arrayOf(inTypeParamsImpl)
-            )
-            val parseData = ParseDataUtils.parseData<T>(id, it, null, outTypeParamsImpl)
-            return@map parseData
-        }
+        val responseBodyConverter = FastJsonResponseBodyConverter<T>()
+        val parseData = responseBodyConverter.converter(id, p, request, it, T::class.java)
+        //NetPointEvent.addRequestEndEvent(request, parseData)
+        return@map parseData
     }.onErrorResumeNext {
         val error = ParseDataUtils.handleError(it, request)
         Maybe.error<T>(error)
     }
 }
-
-/**
- * 反射获取泛型使用
- */
-abstract class RefParamsType<T>
-
 
 ///////////////文件下载转换//////////////////
 /**

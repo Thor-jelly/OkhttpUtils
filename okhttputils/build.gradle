@@ -58,10 +58,10 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.annotation:annotation:1.5.0'
+    implementation 'androidx.annotation:annotation:1.6.0'
     //kotlin
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.7.21"
+    implementation 'androidx.core:core-ktx:1.10.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.20"
     //okhttp
     implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.2'
     //gson
@@ -69,6 +69,10 @@ dependencies {
     //rxjava
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
     implementation 'io.reactivex.rxjava3:rxjava:3.1.0'
+    //fastjson
+    implementation 'com.alibaba:fastjson:1.2.80'
+    implementation 'com.alibaba:fastjson:1.2.80.android'
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.7.21"
 }
 
 //apply plugin: 'maven'
