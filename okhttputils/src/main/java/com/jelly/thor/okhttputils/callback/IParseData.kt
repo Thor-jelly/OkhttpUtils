@@ -11,6 +11,12 @@ import java.lang.reflect.ParameterizedType
  * 创建时间：2022/12/5 14:28 <br/>
  */
 interface IParseData {
+//    fun <T> parseData(
+//        id: Int,
+//        response: Response,
+//        type: Type
+//    ): T
+
     fun <T> parseData(
         id: Int,
         response: Response,

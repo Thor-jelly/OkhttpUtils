@@ -3,12 +3,10 @@ package com.jelly.thor.example.netserver
 import android.net.ParseException
 import com.alibaba.fastjson.JSON
 import com.alibaba.fastjson.TypeReference
-import com.google.gson.Gson
 import com.google.gson.JsonParseException
 import com.jelly.thor.okhttputils.callback.IParseData
 import com.jelly.thor.okhttputils.model.ResponseModel
 import com.jelly.thor.okhttputils.utils.ErrorCode
-import com.jelly.thor.okhttputils.utils.GsonTypes
 import com.jushuitan.jht.basemodule.utils.net.exception.ResponseException
 import com.jushuitan.jht.basemodule.utils.net.exception.ServerException
 import okhttp3.Request
@@ -26,6 +24,21 @@ import javax.net.ssl.SSLHandshakeException
  * 创建时间：2022/12/5 14:34 <br/>
  */
 class ParseDataImpl : IParseData {
+//    override fun <T> parseData(id: Int, response: Response, type: Type): T {
+//        //网络请求码错误
+//        if (!response.isSuccessful) {
+//            throw ServerException(ErrorCode.NET_ERROR, "服务器请求失败！")
+//        }
+//
+//        if (response.body == null) {
+//            throw ServerException(ErrorCode.NET_ERROR, "服务器请求失败！")
+//        }
+//
+//        val responseStr = response.body!!.string()
+//        val model = JSON.parseObject(responseStr, type) as T
+//        return model
+//    }
+
     override fun <T> parseData(
         id: Int,
         response: Response,

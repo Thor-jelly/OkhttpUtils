@@ -13,6 +13,19 @@ import java.lang.reflect.ParameterizedType
  * 创建时间：2022/4/27 11:31 <br/>
  */
 object ParseDataUtils {
+//    @JvmStatic
+//    fun <T> parseData(
+//        id: Int,
+//        response: Response,
+//        type: Type
+//    ): T {
+//        return OkHttpUtils.getInstance().parseData.parseData(
+//            id,
+//            response,
+//            type
+//        )
+//    }
+
     @JvmOverloads
     @JvmStatic
     fun <T> parseData(
