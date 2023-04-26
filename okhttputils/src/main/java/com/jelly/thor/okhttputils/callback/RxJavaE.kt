@@ -57,9 +57,7 @@ fun Maybe<Response>.fileConversion(
             request = it.request
             try {
                 val body = it.body ?: throw ServerException(ErrorCode.SAVE_FILE, savaErrorHint)
-                val inputStream = body.byteStream()
-                val total = body.contentLength()
-                val uri = inputStream.save2File(
+                val uri = body.source().save2File(
                     GetApplication.get(),
                     destFileName,
                     destFileDir

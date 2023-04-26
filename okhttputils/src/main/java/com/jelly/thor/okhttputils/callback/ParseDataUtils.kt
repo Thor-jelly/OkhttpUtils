@@ -31,7 +31,7 @@ object ParseDataUtils {
     fun <T> parseData(
         id: Int,
         response: Response,
-        clazz: Class<T>? = null,
+        clazz: Class<*>? = null,
         parameterizedTypeImpl: ParameterizedType? = null
     ): T {
         return OkHttpUtils.getInstance().parseData.parseData(

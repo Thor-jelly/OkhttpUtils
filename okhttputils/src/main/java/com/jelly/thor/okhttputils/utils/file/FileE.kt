@@ -6,6 +6,14 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Base64
+import com.jushuitan.jht.basemodule.utils.kotlin.uri2File
+import okio.Source
+import okio.buffer
+import okio.sink
+import okio.source
+import java.io.BufferedInputStream
+import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
@@ -26,135 +34,6 @@ private val PIC_DIR = Environment.DIRECTORY_PICTURES
 private val DOWNLOADS_DIR = Environment.DIRECTORY_DOWNLOADS
 
 /**
- * 回传文件使用 ，方便直接通过model获取到文件file
- */
-private class CallBackFile(var file: File? = null)
-
-/**
- * 复制图片到相册
- * @param fileName 文件名。 需要携带后缀
- * @param relativePath 相对于Pictures的路径
- */
-@JvmOverloads
-fun File.save2Pic(
-    context: Context,
-    fileName: String,
-    relativePath: String? = "ddw/"
-): Uri? {
-    if (!this.exists() || !this.canRead()) {
-        //Timber.tag("123===").w("复制图片到相册：文件不存在或不可读")
-        return null
-    }
-    return this.inputStream().use {
-        it.save2Pic(context, fileName, relativePath)
-    }
-}
-
-/**
- * 复制文件到下载
- * @param fileName 文件名。 需要携带后缀
- * @param relativePath 相对于Pictures的路径
- * @param progressCallback 文件进度回调
- */
-@JvmOverloads
-fun File.save2File(
-    context: Context,
-    fileName: String,
-    relativePath: String? = "ddw/",
-    progressCallback: FileInProgress? = null
-): Uri? {
-    if (!this.exists() || !this.canRead()) {
-        //Timber.tag("123===").w("复制文件到下载：文件不存在或不可读")
-        return null
-    }
-    return this.inputStream().use {
-        it.save2File(context, fileName, relativePath, progressCallback)
-    }
-}
-
-/**
- * 保存图片图片到相册
- * @param fileName 文件名。 需要携带后缀
- * @param relativePath 相对于Pictures的路径
- */
-@JvmOverloads
-fun InputStream.save2Pic(
-    context: Context,
-    fileName: String,
-    relativePath: String? = "ddw/"
-): Uri? {
-    val contentResolver = context.contentResolver
-    val callBackFile = CallBackFile()
-    val imageUri = contentResolver.insertMediaImage(fileName, relativePath, callBackFile)
-    if (imageUri == null) {
-        //Timber.tag("123===").w("插入到相册中失败，获取uri为null")
-        return null
-    }
-
-    (imageUri.outputStream(contentResolver) ?: return null).use { output ->
-        this.use { input ->
-            input.copyTo(output)
-            imageUri.finishPending(context, contentResolver, fileName, callBackFile.file)
-        }
-    }
-    return imageUri
-}
-
-/**
- * 保存文件到下载
- * @param fileName 文件名。 需要携带后缀
- * @param relativePath 相对于Pictures的路径
- * @param progressCallback 文件进度回调
- */
-@JvmOverloads
-fun InputStream.save2File(
-    context: Context,
-    fileName: String,
-    relativePath: String? = "ddw/",
-    progressCallback: FileInProgress? = null
-): Uri? {
-    val contentResolver = context.contentResolver
-    val callBackFile = CallBackFile()
-    val imageUri = contentResolver.insertMediaFile(fileName, relativePath, callBackFile)
-    if (imageUri == null) {
-        //Timber.tag("123===").w("插入到downloads中失败，获取uri为null")
-        return null
-    }
-
-    (imageUri.outputStream(contentResolver) ?: return null).use { output ->
-        this.use { input ->
-            if (progressCallback == null) {
-                input.copyTo(output)
-            } else {
-                input.copy2To(output, progressCallback = progressCallback)
-            }
-            imageUri.finishPending(context, contentResolver, fileName, callBackFile.file)
-        }
-    }
-    return imageUri
-}
-
-private fun InputStream.copy2To(
-    out: OutputStream,
-    bufferSize: Int = DEFAULT_BUFFER_SIZE,
-    progressCallback: FileInProgress?
-): Long {
-    var bytesCopied: Long = 0
-    val buffer = ByteArray(bufferSize)
-    var bytes = read(buffer)
-    while (bytes >= 0) {
-        out.write(buffer, 0, bytes)
-        bytesCopied += bytes
-        progressCallback?.inProgress(
-            bytesCopied / progressCallback.totalSize.toFloat(),
-            progressCallback.totalSize
-        )
-        bytes = read(buffer)
-    }
-    return bytesCopied
-}
-
-/**
  * 保存Bitmap到相册的Pictures文件夹
  *
  * https://developer.android.google.cn/training/data-storage/shared/media
@@ -165,16 +44,15 @@ private fun InputStream.copy2To(
  * @param quality 质量
  */
 @JvmOverloads
-fun Bitmap.save2Pic(
-    context: Context,
-    fileName: String,
-    relativePath: String? = "ddw/",
-    quality: Int = 100
+fun Bitmap?.save2Pic(
+    context: Context, fileName: String, relativePath: String? = "jht/", quality: Int = 100
 ): Uri? {
+    if (this == null) {
+        return null
+    }
     // 插入图片信息
     val contentResolver = context.contentResolver
-    val callBackFile = CallBackFile()
-    val imageUri = contentResolver.insertMediaImage(fileName, relativePath, callBackFile)
+    val imageUri = contentResolver.insertMediaFile(fileName, relativePath)
     if (imageUri == null) {
         //Timber.tag("123===").w("插入到相册中失败，获取uri为null")
         return null
@@ -184,29 +62,110 @@ fun Bitmap.save2Pic(
     (imageUri.outputStream(contentResolver) ?: return null).use {
         val format = fileName.getBitmapFormat()
         this@save2Pic.compress(format, quality, it)
-        imageUri.finishPending(context, contentResolver, fileName, callBackFile.file)
+        imageUri.finishPending(context, contentResolver, fileName)
     }
     return imageUri
 }
 
 /**
+ * 复制文件到下载
+ * @param fileName 文件名。 需要携带后缀
+ * @param relativePath 相对于Pictures的路径
+ * @param progressCallback 文件进度回调
+ */
+@JvmOverloads
+fun File?.save2File(
+    context: Context,
+    fileName: String,
+    relativePath: String? = "jht/",
+    progressCallback: FileInProgress? = null
+): Uri? {
+    if (this == null || !this.exists() || !this.canRead()) {
+        //Timber.tag("123===").w("复制文件到下载：文件不存在或不可读")
+        return null
+    }
+    return this.inputStream().save2File(context, fileName, relativePath, progressCallback)
+}
+
+/**
+ * 保存文件到下载
+ * @param fileName 文件名。 需要携带后缀
+ * @param relativePath 相对于Pictures的路径
+ * @param progressCallback 文件进度回调
+ */
+@JvmOverloads
+fun InputStream?.save2File(
+    context: Context,
+    fileName: String,
+    relativePath: String? = "jht/",
+    progressCallback: FileInProgress? = null
+): Uri? {
+    if (this == null) {
+        return null
+    }
+    val uri = this.source().save2File(context, fileName, relativePath, progressCallback)
+    return uri
+}
+
+@JvmOverloads
+fun Source?.save2File(
+    context: Context,
+    fileName: String,
+    relativePath: String? = "jht/",
+    progressCallback: FileInProgress? = null
+): Uri? {
+    if (this == null) {
+        return null
+    }
+    val contentResolver = context.contentResolver
+    val uri = contentResolver.insertMediaFile(fileName, relativePath)
+    if (uri == null) {
+        //Timber.tag("123===").w("插入到downloads中失败，获取uri为null")
+        return null
+    }
+
+    val sink = uri.outputStream(contentResolver)?.sink() ?: return null
+    sink.use { outSink ->
+        val bufferSink = outSink.buffer()
+        val buffer = bufferSink.buffer
+        this.use { input ->
+            var totalBytesRead = 0L
+            while (true) {
+                val readCount: Long = input.read(buffer, DEFAULT_BUFFER_SIZE.toLong())
+                if (readCount == -1L) break
+                totalBytesRead += readCount
+                bufferSink.emitCompleteSegments()
+                bufferSink.flush()
+                progressCallback?.inProgress(
+                    totalBytesRead,
+                    progressCallback.totalSize
+                )
+            }
+        }
+        uri.finishPending(context, contentResolver, fileName)
+    }
+    return uri
+}
+
+/**
  * 通知刷新
  */
-private fun Uri.finishPending(
-    context: Context,
-    contentResolver: ContentResolver,
-    fileName: String,
-    callBackFile: File?
+private fun Uri?.finishPending(
+    context: Context, contentResolver: ContentResolver, fileName: String
 ) {
+    if (this == null) {
+        return
+    }
     val contentValues = ContentValues()
+    uri2File()?.let {
+        contentValues.put(MediaStore.MediaColumns.SIZE, it.length())
+    }
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         // Android Q添加了IS_PENDING状态，为0时其他应用才可见
         contentValues.put(MediaStore.MediaColumns.IS_PENDING, 0)
         contentResolver.update(this, contentValues, null, null)
     } else {
-        if (callBackFile != null) {
-            contentValues.put(MediaStore.MediaColumns.SIZE, callBackFile.length())
-        }
         contentResolver.update(this, contentValues, null, null)
         // 通知媒体库更新
         val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, this)
@@ -214,7 +173,10 @@ private fun Uri.finishPending(
     }
 }
 
-private fun Uri.outputStream(contentResolver: ContentResolver): OutputStream? {
+private fun Uri?.outputStream(contentResolver: ContentResolver): OutputStream? {
+    if (this == null) {
+        return null
+    }
     return try {
         contentResolver.openOutputStream(this)
     } catch (e: Exception) {
@@ -231,9 +193,9 @@ private fun String.getBitmapFormat(): Bitmap.CompressFormat {
     return when {
         fileName.endsWith(".png") -> Bitmap.CompressFormat.PNG
         fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") -> Bitmap.CompressFormat.JPEG
-        fileName.endsWith(".webp") ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) Bitmap.CompressFormat.WEBP_LOSSLESS
-            else Bitmap.CompressFormat.WEBP
+        fileName.endsWith(".webp") -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) Bitmap.CompressFormat.WEBP_LOSSLESS
+        else Bitmap.CompressFormat.WEBP
+
         else -> Bitmap.CompressFormat.PNG
     }
 }
@@ -257,113 +219,10 @@ private fun String.getMineType(): String {
 }
 
 /**
- * 插入图片到媒体库中
- */
-private fun ContentResolver.insertMediaImage(
-    fileName: String,
-    relativePath: String?,
-    callBackFile: CallBackFile? = null
-): Uri? {
-    //图片信息
-    val contentResolver = ContentValues().apply {
-        val mineType = fileName.getMineType()
-        if (mineType.startsWith("image")) {
-            put(MediaStore.MediaColumns.MIME_TYPE, mineType)
-        }
-        val time = System.currentTimeMillis() / 1000
-        put(MediaStore.MediaColumns.DATE_ADDED, time)
-        put(MediaStore.MediaColumns.DATE_MODIFIED, time)
-    }
-    //保存位置
-    val collection: Uri
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        val path = if (relativePath.isNullOrEmpty()) {
-            PIC_DIR
-        } else {
-            "$PIC_DIR/${relativePath}"
-        }
-        contentResolver.apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
-            put(MediaStore.MediaColumns.RELATIVE_PATH, path)
-            put(MediaStore.MediaColumns.IS_PENDING, 1)
-        }
-        collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-        // 高版本不用查重直接插入，会自动重命名
-    } else {
-        val picturesDir = Environment.getExternalStoragePublicDirectory(PIC_DIR)
-        val saveDir =
-            if (relativePath.isNullOrEmpty()) picturesDir else File(picturesDir, relativePath)
-        if (!saveDir.exists() && !saveDir.mkdirs()) {
-            //Timber.tag("123===").w("不能创建pictures 文件夹")
-            return null
-        }
-        //查重文件，如果重复文件名后添加数字
-        var imageFile = File(saveDir, fileName)
-        val fileNameWithoutExtension = imageFile.nameWithoutExtension
-        val fileExtension = imageFile.extension
-
-        var queryUri = this.queryMediaImage28(imageFile.absolutePath)
-        var suffix = 1
-        while (queryUri != null) {
-            val newFileName = fileNameWithoutExtension + "(${suffix++}).${fileExtension}"
-            imageFile = File(saveDir, newFileName)
-            queryUri = this.queryMediaImage28(imageFile.absolutePath)
-        }
-        contentResolver.apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, imageFile.name)
-            put(MediaStore.MediaColumns.DATA, imageFile.absolutePath)
-        }
-
-        callBackFile?.file = imageFile// 回传文件，用于设置文件大小
-        collection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-    }
-
-    //插入图片信息
-    return this.insert(collection, contentResolver)
-}
-
-/**
- * Android Q以下版本，查询媒体库中当前路径是否存在
- * @return 返回null表示不存在
- */
-private fun ContentResolver.queryMediaImage28(path: String): Uri? {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) return null
-
-    val imageFile = File(path)
-    if (imageFile.canRead() && imageFile.exists()) {
-        //Timber.tag("123===").w("查询到文件：${path}存在")
-        return Uri.fromFile(imageFile)
-    }
-    //保存的位置
-    val collection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-    //查询是否已经存在相同的文件
-    val query = this.query(
-        collection,
-        arrayOf(MediaStore.MediaColumns._ID, MediaStore.MediaColumns.DATA),
-        "${MediaStore.MediaColumns.DATA} == ?",
-        arrayOf(path),
-        null
-    )
-    query?.use {
-        while (it.moveToNext()) {
-            val idColumn = it.getColumnIndexOrThrow(MediaStore.MediaColumns._ID)
-            val id = it.getLong(idColumn)
-            val existsUri = ContentUris.withAppendedId(collection, id)
-            //Timber.tag("123===").w("查询到文件路径=${path} 存在相同的uri=${existsUri}")
-            return existsUri
-        }
-    }
-    return null
-}
-
-
-/**
- * 插入图片到媒体库中
+ * 插入文件到媒体库中
  */
 private fun ContentResolver.insertMediaFile(
-    fileName: String,
-    relativePath: String?,
-    callBackFile: CallBackFile? = null
+    fileName: String, relativePath: String?
 ): Uri? {
     //图片信息
     val mineType = fileName.getMineType()
@@ -377,11 +236,16 @@ private fun ContentResolver.insertMediaFile(
     }
     //保存位置
     val collection: Uri
+    val dirStr = if (isImage) {
+        PIC_DIR
+    } else {
+        DOWNLOADS_DIR
+    }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         val path = if (relativePath.isNullOrEmpty()) {
-            DOWNLOADS_DIR
+            dirStr
         } else {
-            "$DOWNLOADS_DIR/${relativePath}"
+            "${dirStr}/${relativePath}"
         }
         contentResolver.apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
@@ -395,31 +259,30 @@ private fun ContentResolver.insertMediaFile(
         }
         // 高版本不用查重直接插入，会自动重命名
     } else {
-        val picturesDir = Environment.getExternalStoragePublicDirectory(DOWNLOADS_DIR)
+        val dir = Environment.getExternalStoragePublicDirectory(dirStr)
         val saveDir =
-            if (relativePath.isNullOrEmpty()) picturesDir else File(picturesDir, relativePath)
+            if (relativePath.isNullOrEmpty()) dir else File(dir, relativePath)
         if (!saveDir.exists() && !saveDir.mkdirs()) {
             //Timber.tag("123===").w("不能创建downloads 文件夹")
             return null
         }
         //查重文件，如果重复文件名后添加数字
-        var imageFile = File(saveDir, fileName)
-        val fileNameWithoutExtension = imageFile.nameWithoutExtension
-        val fileExtension = imageFile.extension
+        var file = File(saveDir, fileName)
+        val fileNameWithoutExtension = file.nameWithoutExtension
+        val fileExtension = file.extension
 
-        var queryUri = this.queryMediaFile28(isImage, imageFile.absolutePath)
+        var queryUri = this.queryMediaFile28(isImage, file.absolutePath)
         var suffix = 1
         while (queryUri != null) {
             val newFileName = fileNameWithoutExtension + "(${suffix++}).${fileExtension}"
-            imageFile = File(saveDir, newFileName)
-            queryUri = this.queryMediaFile28(isImage, imageFile.absolutePath)
+            file = File(saveDir, newFileName)
+            queryUri = this.queryMediaFile28(isImage, file.absolutePath)
         }
         contentResolver.apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, imageFile.name)
-            put(MediaStore.MediaColumns.DATA, imageFile.absolutePath)
+            put(MediaStore.MediaColumns.DISPLAY_NAME, file.name)
+            put(MediaStore.MediaColumns.DATA, file.absolutePath)
         }
 
-        callBackFile?.file = imageFile// 回传文件，用于设置文件大小
         if (isImage) {
             collection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         } else {
@@ -427,7 +290,7 @@ private fun ContentResolver.insertMediaFile(
         }
     }
 
-    //插入图片信息
+    //插入文件信息
     return this.insert(collection, contentResolver)
 }
 
@@ -444,18 +307,13 @@ private fun ContentResolver.queryMediaFile28(isImage: Boolean, path: String): Ur
         return Uri.fromFile(file)
     }
     //保存的位置
-    val collection =
-        if (isImage) MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        else MediaStore.Files.getContentUri("external")
+    val collection = if (isImage) MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+    else MediaStore.Files.getContentUri("external")
     val projection = arrayOf(MediaStore.MediaColumns._ID, MediaStore.MediaColumns.DATA)
     val selection = "${MediaStore.MediaColumns.DATA} == ?"
     //查询是否已经存在相同的文件
     val query = this.query(
-        collection,
-        projection,
-        selection,
-        arrayOf(path),
-        null
+        collection, projection, selection, arrayOf(path), null
     )
     query?.use {
         while (it.moveToNext()) {
@@ -467,4 +325,46 @@ private fun ContentResolver.queryMediaFile28(isImage: Boolean, path: String): Ur
         }
     }
     return null
+}
+
+/**
+ * 安装apk文件
+ */
+fun Context?.installApk(uri: Uri?) {
+    if (this == null || uri == null) {
+        return
+    }
+    val intent = Intent(Intent.ACTION_VIEW)
+    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        //Log.w(TAG, "版本大于 N ，开始使用 fileProvider 进行安装");
+        intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        //Uri contentUri = FileProvider.getUriForFile(
+        //        context
+        //        , SmallApp.getAppContext().getPackageName() + ".fileProvider"
+        //        , apkFile);
+        intent.setDataAndType(uri, "application/vnd.android.package-archive")
+    } else {
+        intent.setDataAndType(uri, "application/vnd.android.package-archive")
+    }
+    startActivity(intent)
+}
+
+@JvmOverloads
+fun String?.base64ToUri(
+    context: Context,
+    fileName: String,
+    relativePath: String? = "jht/",
+): Uri? {
+    if (this.isNullOrEmpty()) {
+        return null
+    }
+    val bytes: ByteArray = Base64.decode(this, Base64.DEFAULT)
+    val byteArrayInputStream = ByteArrayInputStream(bytes)
+    val bufferedInputStream = BufferedInputStream(byteArrayInputStream)
+    return bufferedInputStream.save2File(
+        context,
+        fileName,
+        relativePath
+    )
 }

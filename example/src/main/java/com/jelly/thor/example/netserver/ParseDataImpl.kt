@@ -42,7 +42,7 @@ class ParseDataImpl : IParseData {
     override fun <T> parseData(
         id: Int,
         response: Response,
-        clazz: Class<T>?,
+        clazz: Class<*>?,
         parameterizedTypeImpl: ParameterizedType?
     ): T {
         //是否需要转换数据

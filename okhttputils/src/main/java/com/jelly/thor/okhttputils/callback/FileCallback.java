@@ -11,13 +11,16 @@ import com.jelly.thor.okhttputils.utils.file.FileInProgress;
 import java.io.IOException;
 import java.io.InputStream;
 
+import kotlin.Deprecated;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 /**
  * 类描述：下载返回调用的 <br/>
  * 创建人：吴冬冬<br/>
  * 创建时间：2018/5/15 18:22 <br/>
  */
+@Deprecated(message = "请使用OkHttpDownload具有进度，如果不需要进度请使用rxjava的fileConversion")
 public abstract class FileCallback extends Callback<Uri> {
     /**
      * 目标文件存储的文件夹路径
@@ -51,13 +54,13 @@ public abstract class FileCallback extends Callback<Uri> {
 //        byte[] buf = new byte[2048];
 //        int len = 0;
 //        FileOutputStream fos = null;
+        ResponseBody body = response.body();
         try {
-            InputStream is = response.body().byteStream();
-            long total = response.body().contentLength();
+            long total = body.contentLength();
 
-            return FileEKt.save2File(is, GetApplication.get(), destFileName, destFileDir, new FileInProgress(total) {
+            return FileEKt.save2File(body.source(), GetApplication.get(), destFileName, destFileDir, new FileInProgress(total) {
                 @Override
-                public void inProgress(float progress, long total) {
+                public void inProgress(long progress, long total) {
                     //返回下载的进度
                     Platform.get().execute(new Runnable() {
                         @Override
@@ -92,7 +95,7 @@ public abstract class FileCallback extends Callback<Uri> {
 //            return file;
         } finally {
             try {
-                response.body().close();
+                body.close();
                 //FileEKt.save2File 中有 close方法
                 //if (is != null) is.close();
             } catch (Exception e) {

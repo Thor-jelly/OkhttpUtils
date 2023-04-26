@@ -36,7 +36,7 @@ class FastJsonResponseBodyConverter<T> : Converter<T>() {
         //return ParseDataUtils.parseData<T>(id, response, type)
         if (type !is ParameterizedType) {
             val parseData =
-                ParseDataUtils.parseData<T>(id, response, responseClazz ?: type as Class<T>)
+                ParseDataUtils.parseData<T>(id, response, responseClazz ?: type as Class<*>)
             return parseData
         }
         if (ResponseModel::class.java.canonicalName == (type.rawType as Class<*>).canonicalName) {
@@ -48,7 +48,7 @@ class FastJsonResponseBodyConverter<T> : Converter<T>() {
             val parseData = ParseDataUtils.parseData<T>(
                 id,
                 response,
-                responseClazz ?: type as Class<T>,
+                ResponseModel::class.java,
                 getPTypeImpl
             )
             return parseData

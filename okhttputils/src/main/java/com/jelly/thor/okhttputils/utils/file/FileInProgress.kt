@@ -10,5 +10,5 @@ abstract class FileInProgress constructor(val totalSize: Long) {
      * @param progress 进度
      * @param total 总大小
      */
-    abstract fun inProgress(progress: Float, total: Long)
+    abstract fun inProgress(progress: Long, total: Long)
 }
