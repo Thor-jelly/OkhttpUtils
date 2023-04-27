@@ -1,6 +1,10 @@
 package com.jelly.thor.okhttputils.utils.file
 
-import android.content.*
+import android.content.ContentResolver
+import android.content.ContentUris
+import android.content.ContentValues
+import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
@@ -345,7 +349,7 @@ fun Context?.installApk(uri: Uri?) {
         //        , apkFile);
         intent.setDataAndType(uri, "application/vnd.android.package-archive")
     } else {
-        intent.setDataAndType(uri, "application/vnd.android.package-archive")
+        intent.setDataAndType(Uri.fromFile(uri.uri2File()), "application/vnd.android.package-archive")
     }
     startActivity(intent)
 }
