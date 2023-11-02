@@ -1,8 +1,8 @@
 package com.jelly.thor.okhttputils.request;
 
 import com.jelly.thor.okhttputils.OkHttpUtils;
-import com.jelly.thor.okhttputils.tag.TagBeen;
-import com.jelly.thor.okhttputils.utils.Exceptions;
+import com.jelly.thor.okhttputils.builder.OkHttpRequestBuilder;
+import com.jelly.thor.okhttputils.tag.TagModel;
 
 import java.util.Map;
 
@@ -16,77 +16,47 @@ import okhttp3.RequestBody;
  * 创建时间：2018/5/14 15:12 <br/>
  */
 public abstract class OkHttpRequest {
+    public OkHttpRequestBuilder<? extends OkHttpRequestBuilder<?>> okHttpRequestBuilder;
     protected String url;
-    protected Object tag;
-    protected Map<String, String> params;
-    protected Map<String, String> headers;
-    protected int id;
-    public boolean isShowDialog;
-    public boolean isShowToast;
 
     protected Request.Builder builder = new Request.Builder();
 
     /**
-     * get调用
+     * GET调用
      */
-    protected OkHttpRequest(String url, Object tag, Map<String, String> headers, int id, boolean isShowDialog, boolean isShowToast) {
-        init(url, tag, null, headers, id, isShowDialog, isShowToast);
+    public OkHttpRequest(String url, OkHttpRequestBuilder<? extends OkHttpRequestBuilder<?>> builder) {
+        okHttpRequestBuilder = builder;
+        init(url);
     }
 
-    /**
-     * 参数是键值对格式
-     */
-    protected OkHttpRequest(String url, Object tag, Map<String, String> params, Map<String, String> headers, int id, boolean isShowDialog, boolean isShowToast) {
-        init(url, tag, params, headers, id, isShowDialog, isShowToast);
-    }
-
-    /**
-     * 初始化
-     */
-    private void init(String url, Object tag, Map<String, String> params, Map<String, String> headers, int id, boolean isShowDialog, boolean isShowToast) {
+    private void init(String url) {
         this.url = url;
-        this.tag = tag;
-        this.params = params;
-        this.headers = headers;
-        this.id = id;
-        this.isShowDialog = isShowDialog;
-        this.isShowToast = isShowToast;
-
         if (url == null) {
-            Exceptions.illegalArgument("url can not be null.");
+            throw new IllegalArgumentException("url can not be null！");
         }
 
         initBuilder();
     }
 
     /**
-     * 初始化一些基本参数 url , tag , headers
+     * 初始化请求的一些基本参数 url , tag , headers
      */
     private void initBuilder() {
         builder.url(url);
-
-        TagBeen tagBeen = new TagBeen();
-        if (tag != null) {
-            tagBeen.setTag(tag);
+        TagModel tagModel = new TagModel();
+        if (null != okHttpRequestBuilder.getTag()) {
+            tagModel.setTag(okHttpRequestBuilder.getTag());
         }
-        tagBeen.setShowDialog(isShowDialog);
-        builder.tag(tagBeen);
+        builder.tag(tagModel);
 
         appendHeaders();
     }
 
     /**
-     * post请求添加请求体
+     * 设置初始请求头
      */
-    protected abstract RequestBody requestBody();
-
-    public RequestCall build() {
-        return new RequestCall(this);
-    }
-
     private void appendHeaders() {
         Headers.Builder headerBuilder = null;
-
         //通用请求头
         Map<String, String> commonHeaders = OkHttpUtils.getInstance().getCommonHeaders();
         if (commonHeaders != null && !commonHeaders.isEmpty()) {
@@ -99,6 +69,7 @@ public abstract class OkHttpRequest {
         }
 
         //当前请求设置的请求头
+        Map<String, String> headers = okHttpRequestBuilder.getHeaders();
         if (headers != null && !headers.isEmpty()) {
             if (headerBuilder == null) {
                 headerBuilder = new Headers.Builder();
@@ -114,9 +85,14 @@ public abstract class OkHttpRequest {
         }
     }
 
-    int getId() {
-        return id;
+    public RequestCall build() {
+        return new RequestCall(this);
     }
+
+    /**
+     * post请求添加请求体
+     */
+    protected abstract RequestBody requestBody();
 
     Request getRequest() {
         //post请求会有params参数

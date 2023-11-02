@@ -1,13 +1,13 @@
 package com.jelly.thor.okhttputils.callback
 
 import android.net.Uri
+import com.jelly.thor.okhttputils.OkHttpUtils
 import com.jelly.thor.okhttputils.converters.IRefParamsType
 import com.jelly.thor.okhttputils.converters.RefParamsType
-import com.jelly.thor.okhttputils.converters.fastjson.FastJsonResponseBodyConverter
 import com.jelly.thor.okhttputils.utils.ErrorCode
 import com.jelly.thor.okhttputils.utils.GetApplication
 import com.jelly.thor.okhttputils.utils.file.save2File
-import com.jushuitan.jht.basemodule.utils.net.exception.ServerException
+import com.jelly.thor.okhttputils.exception.ServerException
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.schedulers.Schedulers
 import okhttp3.Request
@@ -22,16 +22,19 @@ import okhttp3.Response
 /**
  * @param p 反射获取泛型用，不需要赋值进去
  */
+/**
+ * @param p 反射获取泛型用，不需要赋值进去
+ */
 inline fun <reified T : Any> Maybe<Response>.dataConversion(
     id: Int = 0,
     p: IRefParamsType<T> = object : RefParamsType<T>() {}
 ): Maybe<T> {
     var request: Request? = null
-    return this.map {
+    return this.observeOn(Schedulers.computation()).map {
         request = it.request
-        val responseBodyConverter = FastJsonResponseBodyConverter<T>()
-        val parseData = responseBodyConverter.converter(id, p, request, it, T::class.java)
-        //NetPointEvent.addRequestEndEvent(request, parseData)
+
+        val converterFactory = OkHttpUtils.getInstance().converterFactory
+        val parseData = converterFactory.responseBodyConverter(id, p, request, it, T::class.java)
         return@map parseData
     }.onErrorResumeNext {
         val error = ParseDataUtils.handleError(it, request)
@@ -48,7 +51,7 @@ inline fun <reified T : Any> Maybe<Response>.dataConversion(
  */
 fun Maybe<Response>.fileConversion(
     destFileName: String,
-    destFileDir: String = "jht/",
+    destFileDir: String = "ddw/",
     savaErrorHint: String = "文件下载失败，请重试"
 ): Maybe<Uri> {
     var request: Request? = null

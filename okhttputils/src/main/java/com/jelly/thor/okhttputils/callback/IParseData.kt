@@ -1,9 +1,9 @@
 package com.jelly.thor.okhttputils.callback
 
-import com.jushuitan.jht.basemodule.utils.net.exception.ResponseException
+import com.jelly.thor.okhttputils.exception.ResponseException
 import okhttp3.Request
 import okhttp3.Response
-import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
 
 /**
  * 类描述：数据处理 <br/>
@@ -21,7 +21,7 @@ interface IParseData {
         id: Int,
         response: Response,
         clazz: Class<*>? = null,
-        parameterizedTypeImpl: ParameterizedType? = null
+        parameterizedTypeImpl: Type? = null
     ): T
 
     fun handleError(it: Throwable, request: Request?): ResponseException

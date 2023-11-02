@@ -1,4 +1,4 @@
-package com.jushuitan.jht.basemodule.utils.kotlin
+package com.jelly.thor.okhttputils.utils.file
 
 import android.content.ContentResolver
 import android.net.Uri
@@ -35,14 +35,11 @@ fun Uri?.uri2File(): File? {
         if (cursor.moveToFirst()) {
             val index = cursor.getColumnIndex(MediaStore.MediaColumns.DATA)
             if (index == -1) {
-                //Timber.tag("123===").w("uri转file失败：未获取到index")
                 return null
             }
             val path = cursor.getString(index)
-            //Timber.tag("123===").w("uri转file成功path=：${path}")
             return File(path)
         }
     }
-    //Timber.tag("123===").w("uri转file失败：cursor 解析失败")
     return null
 }

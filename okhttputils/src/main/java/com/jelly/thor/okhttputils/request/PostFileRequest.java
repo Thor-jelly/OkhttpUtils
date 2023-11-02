@@ -1,6 +1,7 @@
 package com.jelly.thor.okhttputils.request;
 
 import com.jelly.thor.okhttputils.OkHttpUtils;
+import com.jelly.thor.okhttputils.builder.OkHttpRequestBuilder;
 import com.jelly.thor.okhttputils.builder.PostFileBuilder;
 import com.jelly.thor.okhttputils.utils.CommontUtils;
 import com.jelly.thor.okhttputils.utils.Exceptions;
@@ -8,7 +9,6 @@ import com.jelly.thor.okhttputils.utils.Exceptions;
 import java.util.List;
 import java.util.Map;
 
-import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -21,8 +21,8 @@ import okhttp3.RequestBody;
 public class PostFileRequest extends OkHttpRequest {
     private List<PostFileBuilder.FileInput> file;
 
-    public PostFileRequest(String url, Object tag, Map<String, String> params, Map<String, String> headers, int id, List<PostFileBuilder.FileInput> file, boolean isShowDialog, boolean isShowToast) {
-        super(url, tag, params, headers, id, isShowDialog, isShowToast);
+    public PostFileRequest(String url, List<PostFileBuilder.FileInput> file, OkHttpRequestBuilder<PostFileBuilder> okHttpRequestBuilder) {
+        super(url, okHttpRequestBuilder);
         this.file = file;
         if (this.file == null || this.file.size() < 1) {
             Exceptions.illegalArgument("the file can not be null !");
@@ -40,7 +40,7 @@ public class PostFileRequest extends OkHttpRequest {
     private MultipartBody moreFile() {
         MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
 
-        addRequestParams(builder, params);
+        addRequestParams(builder, okHttpRequestBuilder.getParams());
 
         Map<String, String> commonParams = OkHttpUtils.getInstance().getCommonParams();
         addRequestParams(builder, commonParams);

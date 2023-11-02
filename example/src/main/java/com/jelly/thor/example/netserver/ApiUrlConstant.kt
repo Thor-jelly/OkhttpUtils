@@ -38,7 +38,7 @@ class ApiUrlConstant private constructor() {
 
         fun getApiUrl(afterUrl: String): String {
             //拼接规则
-            //以"webapi/jht/api"匹配 --- 直接域名 + swagger url
+            //以"webapi/ddw/api"匹配 --- 直接域名 + swagger url
             //--- 直接域名 + swagger url
             return if (afterUrl.startsWith("webapi/ddw/api")) {
                 "${FIRST_API}${afterUrl}"

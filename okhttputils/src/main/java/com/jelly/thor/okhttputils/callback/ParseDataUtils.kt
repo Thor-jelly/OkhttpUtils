@@ -1,10 +1,10 @@
 package com.jelly.thor.okhttputils.callback
 
 import com.jelly.thor.okhttputils.OkHttpUtils
-import com.jushuitan.jht.basemodule.utils.net.exception.ResponseException
+import com.jelly.thor.okhttputils.exception.ResponseException
 import okhttp3.Request
 import okhttp3.Response
-import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
 
 
 /**
@@ -32,7 +32,7 @@ object ParseDataUtils {
         id: Int,
         response: Response,
         clazz: Class<*>? = null,
-        parameterizedTypeImpl: ParameterizedType? = null
+        parameterizedTypeImpl: Type? = null
     ): T {
         return OkHttpUtils.getInstance().parseData.parseData(
             id,

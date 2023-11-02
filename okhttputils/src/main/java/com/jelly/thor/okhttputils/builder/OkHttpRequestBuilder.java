@@ -13,7 +13,7 @@ import java.util.Map;
  * 创建人：吴冬冬<br/>
  * 创建时间：2018/5/14 15:07 <br/>
  */
-public abstract class OkHttpRequestBuilder<T extends OkHttpRequestBuilder> {
+public abstract class OkHttpRequestBuilder<T extends OkHttpRequestBuilder<T>> {
     /**
      * 如果url前半段url都相同可以设置baseURL来简化url设置
      */
@@ -23,7 +23,7 @@ public abstract class OkHttpRequestBuilder<T extends OkHttpRequestBuilder> {
      */
     protected String url;
     /**
-     * 网络请求标志
+     * 网络请求标志，用来取消网络
      */
     protected Object tag;
     /**
@@ -35,6 +35,9 @@ public abstract class OkHttpRequestBuilder<T extends OkHttpRequestBuilder> {
      */
     protected Map<String, String> params;
 
+    /**
+     * 用来请求多个同一网络请求 可以在返回中区分网络请求
+     */
     protected int id;
 
     /**
@@ -82,7 +85,7 @@ public abstract class OkHttpRequestBuilder<T extends OkHttpRequestBuilder> {
     /**
      * 网络请求域名拼接生成新的url
      */
-    protected String getNewUrl() {
+    protected String getNewUrl(){
         String newUrl;
         if (!TextUtils.isEmpty(baseUrl)) {
             if (URLUtil.isValidUrl(url)) {
@@ -100,5 +103,38 @@ public abstract class OkHttpRequestBuilder<T extends OkHttpRequestBuilder> {
             newUrl = url;
         }
         return newUrl;
+    }
+
+    ///////////////////////GET/////////////////////////////////
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public Object getTag() {
+        return tag;
+    }
+
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
+
+    public Map<String, String> getParams() {
+        return params;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public boolean getIsShowDialog() {
+        return isShowDialog;
+    }
+
+    public boolean getIsShowToast() {
+        return isShowToast;
     }
 }

@@ -1,22 +1,19 @@
 package com.jelly.thor.okhttputils.builder;
 
-import android.webkit.URLUtil;
+import androidx.annotation.NonNull;
 
-import com.jelly.thor.okhttputils.OkHttpUtils;
 import com.jelly.thor.okhttputils.request.PostStringRequest;
 import com.jelly.thor.okhttputils.request.RequestCall;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import androidx.annotation.NonNull;
-
 /**
  * 类描述：post Json build <br/>
  * 创建人：吴冬冬<br/>
  * 创建时间：2018/5/14 17:54 <br/>
  */
-public class PostStringBuilder extends OkHttpRequestBuilder<PostStringBuilder> implements HasParamsable, HasHeadersable {
+public class PostStringBuilder extends OkHttpRequestBuilder<PostStringBuilder> implements HasParameters<PostStringBuilder>, HasHeaders<PostStringBuilder> {
     //工具类外转换完直接可以用的json
     private String strParams;
 
@@ -65,6 +62,6 @@ public class PostStringBuilder extends OkHttpRequestBuilder<PostStringBuilder> i
     @Override
     public RequestCall build() {
         String myUrl = getNewUrl();
-        return new PostStringRequest(myUrl, tag, strParams, params, headers, id, isShowDialog, isShowToast).build();
+        return new PostStringRequest(myUrl, this, strParams).build();
     }
 }

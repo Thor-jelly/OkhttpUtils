@@ -11,7 +11,6 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Base64
-import com.jushuitan.jht.basemodule.utils.kotlin.uri2File
 import okio.Source
 import okio.buffer
 import okio.sink
@@ -21,6 +20,7 @@ import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
+import java.util.Locale
 
 /**
  * 类描述：文件扩展 <br/>
@@ -30,12 +30,12 @@ import java.io.OutputStream
 /**
  * 图片文件夹
  */
-private val PIC_DIR = Environment.DIRECTORY_PICTURES
+val PIC_DIR = Environment.DIRECTORY_PICTURES
 
 /**
  * 下载文件夹
  */
-private val DOWNLOADS_DIR = Environment.DIRECTORY_DOWNLOADS
+val DOWNLOADS_DIR = Environment.DIRECTORY_DOWNLOADS
 
 /**
  * 保存Bitmap到相册的Pictures文件夹
@@ -49,7 +49,7 @@ private val DOWNLOADS_DIR = Environment.DIRECTORY_DOWNLOADS
  */
 @JvmOverloads
 fun Bitmap?.save2Pic(
-    context: Context, fileName: String, relativePath: String? = "jht/", quality: Int = 100
+    context: Context, fileName: String, relativePath: String? = "ddw/", quality: Int = 100
 ): Uri? {
     if (this == null) {
         return null
@@ -58,7 +58,6 @@ fun Bitmap?.save2Pic(
     val contentResolver = context.contentResolver
     val imageUri = contentResolver.insertMediaFile(fileName, relativePath)
     if (imageUri == null) {
-        //Timber.tag("123===").w("插入到相册中失败，获取uri为null")
         return null
     }
 
@@ -81,11 +80,10 @@ fun Bitmap?.save2Pic(
 fun File?.save2File(
     context: Context,
     fileName: String,
-    relativePath: String? = "jht/",
+    relativePath: String? = "ddw/",
     progressCallback: FileInProgress? = null
 ): Uri? {
     if (this == null || !this.exists() || !this.canRead()) {
-        //Timber.tag("123===").w("复制文件到下载：文件不存在或不可读")
         return null
     }
     return this.inputStream().save2File(context, fileName, relativePath, progressCallback)
@@ -101,7 +99,7 @@ fun File?.save2File(
 fun InputStream?.save2File(
     context: Context,
     fileName: String,
-    relativePath: String? = "jht/",
+    relativePath: String? = "ddw/",
     progressCallback: FileInProgress? = null
 ): Uri? {
     if (this == null) {
@@ -115,7 +113,7 @@ fun InputStream?.save2File(
 fun Source?.save2File(
     context: Context,
     fileName: String,
-    relativePath: String? = "jht/",
+    relativePath: String? = "ddw/",
     progressCallback: FileInProgress? = null
 ): Uri? {
     if (this == null) {
@@ -124,7 +122,6 @@ fun Source?.save2File(
     val contentResolver = context.contentResolver
     val uri = contentResolver.insertMediaFile(fileName, relativePath)
     if (uri == null) {
-        //Timber.tag("123===").w("插入到downloads中失败，获取uri为null")
         return null
     }
 
@@ -184,7 +181,6 @@ private fun Uri?.outputStream(contentResolver: ContentResolver): OutputStream? {
     return try {
         contentResolver.openOutputStream(this)
     } catch (e: Exception) {
-        //Timber.tag("123===").w(e, "uri 转outputStream 异常")
         null
     }
 }
@@ -223,11 +219,45 @@ private fun String.getMineType(): String {
 }
 
 /**
+ * Gets the extension of a file name, like ".png" or ".jpg".
+ * <p>
+ * url : https://app-xxx-oss/xxx.gif
+ *  or
+ * fileName : xxx.gif
+ *
+ * @param fullExtension true ".png" ; false "png"
+ * @return fullExtension=false, "gif";
+ *         fullExtension=true,  ".gif" substring时不加1
+ */
+private fun getExtension(pathOrName: String?, split: Char, fullExtension: Boolean = false): String {
+    if (pathOrName.isNullOrBlank()) return ""
+    val dot = pathOrName.lastIndexOf(split)
+    return if (dot != -1) pathOrName.substring(
+        if (fullExtension) dot
+        else (dot + 1)
+    ).lowercase(Locale.getDefault())
+    else "" // No extension.
+}
+
+/**
+ * @return [√] "png" ; [×] ".png"
+ */
+private fun getExtension(pathOrName: String): String = getExtension(pathOrName, '.', false)
+
+/**
+ * @return [√] ".png" ; [×] "png"
+ */
+private fun getExtensionFull(pathOrName: String): String = getExtension(pathOrName, '.', true)
+
+/**
  * 插入文件到媒体库中
  */
 private fun ContentResolver.insertMediaFile(
     fileName: String, relativePath: String?
 ): Uri? {
+    val extensionFull = getExtensionFull(fileName)
+    val newTimeFileName =
+        fileName.replace(extensionFull, "${System.currentTimeMillis()}${extensionFull}")
     //图片信息
     val mineType = fileName.getMineType()
     //是否是图片格式
@@ -252,7 +282,7 @@ private fun ContentResolver.insertMediaFile(
             "${dirStr}/${relativePath}"
         }
         contentResolver.apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+            put(MediaStore.MediaColumns.DISPLAY_NAME, newTimeFileName)
             put(MediaStore.MediaColumns.RELATIVE_PATH, path)
             put(MediaStore.MediaColumns.IS_PENDING, 1)
         }
@@ -267,11 +297,10 @@ private fun ContentResolver.insertMediaFile(
         val saveDir =
             if (relativePath.isNullOrEmpty()) dir else File(dir, relativePath)
         if (!saveDir.exists() && !saveDir.mkdirs()) {
-            //Timber.tag("123===").w("不能创建downloads 文件夹")
             return null
         }
         //查重文件，如果重复文件名后添加数字
-        var file = File(saveDir, fileName)
+        var file = File(saveDir, newTimeFileName)
         val fileNameWithoutExtension = file.nameWithoutExtension
         val fileExtension = file.extension
 
@@ -307,7 +336,6 @@ private fun ContentResolver.queryMediaFile28(isImage: Boolean, path: String): Ur
 
     val file = File(path)
     if (file.canRead() && file.exists()) {
-        //Timber.tag("123===").w("查询到文件：${path}存在")
         return Uri.fromFile(file)
     }
     //保存的位置
@@ -324,7 +352,6 @@ private fun ContentResolver.queryMediaFile28(isImage: Boolean, path: String): Ur
             val idColumn = it.getColumnIndexOrThrow(MediaStore.MediaColumns._ID)
             val id = it.getLong(idColumn)
             val existsUri = ContentUris.withAppendedId(collection, id)
-            //Timber.tag("123===").w("查询到文件路径=${path} 存在相同的uri=${existsUri}")
             return existsUri
         }
     }
@@ -349,7 +376,10 @@ fun Context?.installApk(uri: Uri?) {
         //        , apkFile);
         intent.setDataAndType(uri, "application/vnd.android.package-archive")
     } else {
-        intent.setDataAndType(Uri.fromFile(uri.uri2File()), "application/vnd.android.package-archive")
+        intent.setDataAndType(
+            Uri.fromFile(uri.uri2File()),
+            "application/vnd.android.package-archive"
+        )
     }
     startActivity(intent)
 }
@@ -358,7 +388,7 @@ fun Context?.installApk(uri: Uri?) {
 fun String?.base64ToUri(
     context: Context,
     fileName: String,
-    relativePath: String? = "jht/",
+    relativePath: String? = "ddw/",
 ): Uri? {
     if (this.isNullOrEmpty()) {
         return null

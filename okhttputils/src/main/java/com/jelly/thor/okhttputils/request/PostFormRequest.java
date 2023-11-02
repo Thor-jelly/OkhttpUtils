@@ -1,6 +1,8 @@
 package com.jelly.thor.okhttputils.request;
 
 import com.jelly.thor.okhttputils.OkHttpUtils;
+import com.jelly.thor.okhttputils.builder.OkHttpRequestBuilder;
+import com.jelly.thor.okhttputils.builder.PostFormBuilder;
 
 import java.util.Map;
 
@@ -13,15 +15,15 @@ import okhttp3.RequestBody;
  * 创建时间：2018/5/14 17:57 <br/>
  */
 public class PostFormRequest extends OkHttpRequest {
-    public PostFormRequest(String url, Object tag, Map<String, String> params, Map<String, String> headers, int id, boolean isShowDialog, boolean isShowToast) {
-        super(url, tag, params, headers, id, isShowDialog, isShowToast);
+    public PostFormRequest(String url, OkHttpRequestBuilder<PostFormBuilder> okHttpRequestBuilder) {
+        super(url, okHttpRequestBuilder);
     }
 
     @Override
     protected RequestBody requestBody() {
         FormBody.Builder formBody = new FormBody.Builder();
         //添加请求参数
-        addRequestParams(formBody, params);
+        addRequestParams(formBody, okHttpRequestBuilder.getParams());
 
         Map<String, String> commonParams = OkHttpUtils.getInstance().getCommonParams();
         //添加通用请求参数

@@ -1,4 +1,4 @@
-package com.jushuitan.jht.basemodule.utils.net.exception
+package com.jelly.thor.okhttputils.exception
 
 /**
  * 创建人：吴冬冬<br/>

@@ -2,6 +2,8 @@ package com.jelly.thor.okhttputils.builder;
 
 import android.webkit.URLUtil;
 
+import androidx.annotation.NonNull;
+
 import com.jelly.thor.okhttputils.OkHttpUtils;
 import com.jelly.thor.okhttputils.request.PostFileRequest;
 import com.jelly.thor.okhttputils.request.RequestCall;
@@ -11,17 +13,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import androidx.annotation.NonNull;
-
 /**
  * 类描述：文件上传<br/>
  * 创建人：吴冬冬<br/>
  * 创建时间：2018/5/15 15:17 <br/>
  */
-public class PostFileBuilder extends OkHttpRequestBuilder<PostFileBuilder> implements HasParamsable, HasHeadersable {
+public class PostFileBuilder extends OkHttpRequestBuilder<PostFileBuilder> implements HasParameters<PostFileBuilder>, HasHeaders<PostFileBuilder> {
     private List<FileInput> file;
 
-    public OkHttpRequestBuilder files(@NonNull List<FileInput> fileInputList) {
+    public PostFileBuilder files(@NonNull List<FileInput> fileInputList) {
         this.file = fileInputList;
         return this;
     }
@@ -46,8 +46,8 @@ public class PostFileBuilder extends OkHttpRequestBuilder<PostFileBuilder> imple
 
     @Override
     public PostFileBuilder headers(@NonNull Map<String, String> headers) {
-        if (this.headers== null) {
-            this.headers= new LinkedHashMap<>();
+        if (this.headers == null) {
+            this.headers = new LinkedHashMap<>();
         }
         this.headers.putAll(headers);
         return this;
@@ -80,7 +80,7 @@ public class PostFileBuilder extends OkHttpRequestBuilder<PostFileBuilder> imple
         } else {
             myUrl = url;
         }
-        return new PostFileRequest(myUrl, tag, params, headers, id, file, isShowDialog, isShowToast).build();
+        return new PostFileRequest(myUrl, file, this).build();
     }
 
     public static class FileInput {

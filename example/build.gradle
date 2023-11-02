@@ -5,12 +5,11 @@ plugins {
 }
 
 android {
-    compileSdkVersion 33
-
+    compileSdk 34
     defaultConfig {
         applicationId "com.jelly.thor.example"
-        minSdkVersion 19
-        targetSdkVersion 33
+        minSdkVersion 21
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
 
@@ -25,21 +24,21 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = JavaVersion.VERSION_17
     }
     namespace 'com.jelly.thor.example'
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:1.6.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.2.0-alpha06'
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.7.21"
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.0-alpha13'
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.9.10"
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -49,8 +48,8 @@ dependencies {
 
     //rx套餐============================================
     //rxjava
-    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
-    implementation 'io.reactivex.rxjava3:rxjava:3.1.0'
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.2'
+    implementation 'io.reactivex.rxjava3:rxjava:3.1.6'
     //rxbinding
     implementation 'com.jakewharton.rxbinding4:rxbinding:4.0.0'
     implementation 'com.jakewharton.rxbinding4:rxbinding-core:4.0.0'

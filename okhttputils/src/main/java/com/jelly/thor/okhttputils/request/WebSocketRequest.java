@@ -1,9 +1,10 @@
 package com.jelly.thor.okhttputils.request;
 
 import com.jelly.thor.okhttputils.OkHttpUtils;
+import com.jelly.thor.okhttputils.builder.GetWebSocketBuilder;
+import com.jelly.thor.okhttputils.builder.OkHttpRequestBuilder;
 import com.jelly.thor.okhttputils.utils.Exceptions;
 
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Dispatcher;
@@ -20,9 +21,8 @@ import okhttp3.WebSocketListener;
 public class WebSocketRequest extends OkHttpRequest {
     private static final Dispatcher DISPATCHER = new Dispatcher();
 
-    public WebSocketRequest(String url, Object tag, Map<String, String> params, Map<String, String> headers, int id, boolean isShowDialog, boolean isShowToast) {
-        super(url, tag, params, headers, id, isShowDialog, isShowToast);
-        this.newBuild();
+    public WebSocketRequest(String url, OkHttpRequestBuilder<GetWebSocketBuilder> okHttpRequestBuilder) {
+        super(url, okHttpRequestBuilder);
     }
 
     @Override

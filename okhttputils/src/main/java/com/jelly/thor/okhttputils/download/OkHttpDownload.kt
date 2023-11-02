@@ -30,7 +30,7 @@ object OkHttpDownload {
         destFileName: String,
         downloadListener: OkHttpDownloadListener? = null
     ) {
-        download(url, destFileName, "jht/", downloadListener)
+        download(url, destFileName, "ddw/", downloadListener)
     }
 
     /**
@@ -42,7 +42,7 @@ object OkHttpDownload {
     fun download(
         url: String,
         destFileName: String,
-        destFileDir: String,//"jht/"
+        destFileDir: String,//"ddw/"
         downloadListener: OkHttpDownloadListener? = null//文件下载占比例80% 保存文件占20%
     ) {
         /*Timber.tag("123===").d(

@@ -28,7 +28,7 @@ public abstract class Callback<T> {
      */
     @MainThread
     public void onError(int code, String errorMessage, int id, OkHttpRequest okHttpRequest) {
-        if (okHttpRequest.isShowToast) {
+        if (okHttpRequest.okHttpRequestBuilder.getIsShowToast()) {
             Toast.makeText(GetApplication.get().getApplicationContext(), errorMessage, Toast.LENGTH_LONG).show();
         }
     }
@@ -50,7 +50,7 @@ public abstract class Callback<T> {
      */
     @MainThread
     public void onBefore(int id) {
-        if (mOkHttpRequest.isShowDialog) {
+        if (mOkHttpRequest.okHttpRequestBuilder.getIsShowDialog()) {
             LoadDialogUtil instance = LoadDialogUtil.getInstance();
             instance.showLoadDialog(CommontUtils.getActivity());
         }
@@ -69,8 +69,8 @@ public abstract class Callback<T> {
                     continue;
                 }
                 Object tagTag = call.request().tag();
-                if (tagTag instanceof TagBeen) {
-                    TagBeen tagBeen = (TagBeen) tagTag;
+                if (tagTag instanceof TagModel) {
+                    TagModel tagBeen = (TagModel) tagTag;
                     if (tagBeen.isShowDialog()) {
                         LoadDialogUtil instance = LoadDialogUtil.getInstance();
                         if (instance.isShowing()) {
@@ -118,8 +118,8 @@ public abstract class Callback<T> {
                     continue;
                 }
                 Object tagTag = call.request().tag();
-                if (tagTag instanceof TagBeen) {
-                    TagBeen tagBeen = (TagBeen) tagTag;
+                if (tagTag instanceof TagModel) {
+                    TagModel tagBeen = (TagModel) tagTag;
                     if (tagBeen.isShowDialog()) {
                         LoadDialogUtil instance = LoadDialogUtil.getInstance();
                         if (instance.isShowing()) {

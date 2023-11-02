@@ -2,7 +2,6 @@ package com.jelly.thor.okhttputils;
 
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.jelly.thor.okhttputils.builder.GetBuilder;
 import com.jelly.thor.okhttputils.builder.GetWebSocketBuilder;
@@ -10,7 +9,9 @@ import com.jelly.thor.okhttputils.builder.PostFileBuilder;
 import com.jelly.thor.okhttputils.builder.PostFormBuilder;
 import com.jelly.thor.okhttputils.builder.PostStringBuilder;
 import com.jelly.thor.okhttputils.callback.IParseData;
-import com.jelly.thor.okhttputils.tag.TagBeen;
+import com.jelly.thor.okhttputils.converters.Converter;
+import com.jelly.thor.okhttputils.converters.gson.GsonConverterFactory;
+import com.jelly.thor.okhttputils.tag.TagModel;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -24,52 +25,58 @@ import okhttp3.OkHttpClient;
  * 创建时间：2018/5/11 11:22 <br/>
  */
 public class OkHttpUtils {
-    private volatile static OkHttpUtils mInstance;
+    private OkHttpUtils() {
+    }
+
+    private static class Holder {
+        private static final OkHttpUtils H = new OkHttpUtils();
+    }
+
+    public static OkHttpUtils getInstance() {
+        return Holder.H;
+    }
+
+
     private OkHttpClient mOkHttpClient;
     /**
      * 公共的url
      */
-    private String baseUrl;
+    private String mBaseUrl;
+    /**
+     * 通用请求参数
+     */
     private Map<String, String> mCommonParams;
+    /**
+     * 通用请求头
+     */
     private Map<String, String> mCommonHeaders;
-
     /**
      * 数据解析类
      */
     private IParseData mIParseData;
+    /**
+     * 数据解析方案 默认fastJson
+     */
+    private Converter.Factory mConverterFactory;
 
-    private OkHttpUtils() {
+    /**
+     * 在Application中初始化 网络
+     */
+    public static OkHttpUtils initClient(OkHttpClient okHttpClient) {
+        OkHttpUtils h = getInstance();
+        h.setOkhttpClient(okHttpClient);
+        return h;
     }
 
-    private OkHttpUtils(OkHttpClient okHttpClient) {
+    /**
+     * 设置okhttp client
+     */
+    private void setOkhttpClient(OkHttpClient okHttpClient) {
         if (okHttpClient == null) {
             mOkHttpClient = new OkHttpClient();
         } else {
             mOkHttpClient = okHttpClient;
         }
-    }
-
-    public static OkHttpUtils initClient(@Nullable OkHttpClient okHttpClient) {
-        return initClient(okHttpClient, null);
-    }
-
-    /**
-     * 在Application中初始化 网络
-     */
-    public static OkHttpUtils initClient(@Nullable OkHttpClient okHttpClient, @Nullable IParseData iParseData) {
-        if (mInstance == null) {
-            synchronized (OkHttpUtils.class) {
-                if (mInstance == null) {
-                    mInstance = new OkHttpUtils(okHttpClient);
-                    mInstance.setIParseData(iParseData);
-                }
-            }
-        }
-        return mInstance;
-    }
-
-    public static OkHttpUtils getInstance() {
-        return initClient(null);
     }
 
     /**
@@ -79,25 +86,17 @@ public class OkHttpUtils {
         if (mOkHttpClient == null) {
             throw new Error("请先在Application中初始化OkHttpClient, 调用OkHttpUtils.getInstance()或者OkHttpUtils.initClient()方法!");
         }
-        return mOkHttpClient;
-    }
-
-    public void setIParseData(IParseData iParseData) {
-        this.mIParseData = iParseData;
-    }
-
-    public IParseData getParseData() {
         if (mIParseData == null) {
             throw new Error("请先在Application中初始化OkHttpClient, 调用OkHttpUtils.getInstance().setIParseData()或者OkHttpUtils.initClient()方法!");
         }
-        return mIParseData;
+        return mOkHttpClient;
     }
 
     /**
      * 添加基本url
      */
-    public OkHttpUtils setBaseUrl(@NonNull String baseUrl) {
-        this.baseUrl = baseUrl;
+    public OkHttpUtils setBaseUrl(@NonNull String mBaseUrl) {
+        this.mBaseUrl = mBaseUrl;
         return this;
     }
 
@@ -105,7 +104,21 @@ public class OkHttpUtils {
      * 获取基本url
      */
     public String getBaseUrl() {
-        return baseUrl;
+        return mBaseUrl;
+    }
+
+    /**
+     * 添加全局公共请求参数
+     */
+    public OkHttpUtils addCommonParams(@NonNull Map<String, String> commonParams) {
+        if (commonParams.isEmpty()) {
+            return this;
+        }
+        if (mCommonParams == null) {
+            mCommonParams = new LinkedHashMap<>();
+        }
+        mCommonParams.putAll(commonParams);
+        return this;
     }
 
     /**
@@ -118,13 +131,14 @@ public class OkHttpUtils {
     /**
      * 添加全局公共请求参数
      */
-    public OkHttpUtils addCommonParams(@NonNull Map<String, String> commonParams) {
-        if (commonParams != null && !commonParams.isEmpty()) {
-            if (mCommonParams == null) {
-                mCommonParams = new LinkedHashMap<>();
-            }
-            mCommonParams.putAll(commonParams);
+    public OkHttpUtils addCommonHeaders(@NonNull Map<String, String> commonHeaders) {
+        if (commonHeaders.isEmpty()) {
+            return this;
         }
+        if (mCommonHeaders == null) {
+            mCommonHeaders = new LinkedHashMap<>();
+        }
+        mCommonHeaders.putAll(commonHeaders);
         return this;
     }
 
@@ -136,16 +150,52 @@ public class OkHttpUtils {
     }
 
     /**
-     * 添加全局公共请求参数
+     * 设置解析数据处理
      */
-    public OkHttpUtils addCommonHeaders(@NonNull Map<String, String> commonHeaders) {
-        if (commonHeaders != null && !commonHeaders.isEmpty()) {
-            if (mCommonHeaders == null) {
-                mCommonHeaders = new LinkedHashMap<>();
-            }
-            mCommonHeaders.putAll(commonHeaders);
-        }
+    public OkHttpUtils setIParseData(IParseData iParseData) {
+        this.mIParseData = iParseData;
         return this;
+    }
+
+    public IParseData getParseData() {
+        return mIParseData;
+    }
+
+    /**
+     * 设置解析数据处理 默认fastJson处理解析
+     */
+    public OkHttpUtils setConverterFactory(Converter.Factory converterFactory) {
+        this.mConverterFactory = converterFactory;
+        return this;
+    }
+
+    public Converter.Factory getConverterFactory() {
+        if (mConverterFactory == null) {
+            //setConverterFactory(FastJsonConverterFactory.create());
+            setConverterFactory(GsonConverterFactory.create());
+        }
+        return mConverterFactory;
+    }
+
+    /**
+     * 取消所有网络请求
+     */
+    public void cancelAll() {
+        if (mOkHttpClient == null) {
+            throw new Error("请先初始化OkHttpClient, 调用OkHttpUtils.getInstance()或者OkHttpUtils.initClient()方法!");
+        }
+        for (Call call : mOkHttpClient.dispatcher().queuedCalls()) {
+            if (call.isCanceled()) {
+                continue;
+            }
+            call.cancel();
+        }
+        for (Call call : mOkHttpClient.dispatcher().runningCalls()) {
+            if (call.isCanceled()) {
+                continue;
+            }
+            call.cancel();
+        }
     }
 
     /**
@@ -177,8 +227,8 @@ public class OkHttpUtils {
      * 取消tag逻辑
      */
     private void cancelTagMethod(Object tag, Call call, Object tagTag) {
-        if (tagTag instanceof TagBeen) {
-            Object saveTag = ((TagBeen) tagTag).getTag();
+        if (tagTag instanceof TagModel) {
+            Object saveTag = ((TagModel) tagTag).getTag();
             boolean tagIsString = tag instanceof String;
             boolean saveTagIsString = saveTag instanceof String;
             if (tagIsString

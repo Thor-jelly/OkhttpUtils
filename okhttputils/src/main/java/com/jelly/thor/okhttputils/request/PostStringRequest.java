@@ -3,6 +3,8 @@ package com.jelly.thor.okhttputils.request;
 import android.text.TextUtils;
 
 import com.jelly.thor.okhttputils.OkHttpUtils;
+import com.jelly.thor.okhttputils.builder.OkHttpRequestBuilder;
+import com.jelly.thor.okhttputils.builder.PostStringBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,8 +25,8 @@ public class PostStringRequest extends OkHttpRequest {
 
     private final String strParams;
 
-    public PostStringRequest(String url, Object tag, String strParams, Map<String, String> params, Map<String, String> headers, int id, boolean isShowDialog, boolean isShowToast) {
-        super(url, tag, params, headers, id, isShowDialog, isShowToast);
+    public PostStringRequest(String url, OkHttpRequestBuilder<PostStringBuilder> okHttpRequestBuilder, String strParams) {
+        super(url, okHttpRequestBuilder);
         this.strParams = strParams;
     }
 
@@ -35,7 +37,7 @@ public class PostStringRequest extends OkHttpRequest {
         }
         JSONObject jsonObject = new JSONObject();
         //添加请求参数
-        addRequestParams(jsonObject, params);
+        addRequestParams(jsonObject, okHttpRequestBuilder.getParams());
 
         Map<String, String> commonParams = OkHttpUtils.getInstance().getCommonParams();
         //添加通用请求参数

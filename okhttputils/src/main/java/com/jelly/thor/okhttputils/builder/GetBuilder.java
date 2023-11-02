@@ -1,7 +1,6 @@
 package com.jelly.thor.okhttputils.builder;
 
 import android.net.Uri;
-import android.webkit.URLUtil;
 
 import com.jelly.thor.okhttputils.OkHttpUtils;
 import com.jelly.thor.okhttputils.request.GetRequest;
@@ -18,24 +17,24 @@ import androidx.annotation.NonNull;
  * 创建人：吴冬冬<br/>
  * 创建时间：2018/5/14 15:05 <br/>
  */
-public class GetBuilder extends OkHttpRequestBuilder<GetBuilder> implements HasParamsable, HasHeadersable {
+public class GetBuilder extends OkHttpRequestBuilder<GetBuilder> implements HasParameters<GetBuilder>, HasHeaders<GetBuilder> {
     @Override
     public RequestCall build() {
         //处理请求
-        String myUrl = getNewUrl();
+        String newUrl = getNewUrl();
         //设置公用请求参数
         Map<String, String> commonParams = OkHttpUtils.getInstance().getCommonParams();
-        if (params != null) {
+        if (null != params) {
             if (commonParams != null && !commonParams.isEmpty()) {
                 params.putAll(commonParams);
             }
-            myUrl = appendParams(myUrl, params);
+            newUrl = appendParams(newUrl, params);
         } else {
             if (commonParams != null && !commonParams.isEmpty()) {
-                myUrl = appendParams(myUrl, commonParams);
+                newUrl = appendParams(newUrl, commonParams);
             }
         }
-        return new GetRequest(myUrl, tag, headers, id, isShowDialog, isShowToast).build();
+        return new GetRequest(newUrl, this).build();
     }
 
     /**

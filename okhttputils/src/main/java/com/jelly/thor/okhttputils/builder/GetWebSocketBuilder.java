@@ -18,6 +18,6 @@ public class GetWebSocketBuilder extends OkHttpRequestBuilder<GetWebSocketBuilde
     }
 
     public WebSocketRequest newBuild() {
-        return new WebSocketRequest(url, tag, null,null, id, false, false);
+        return new WebSocketRequest(url, this.isShowDialog(false).isShowToast(false));
     }
 }

@@ -16,7 +16,7 @@ import java.util.Set;
  * 创建人：吴冬冬<br/>
  * 创建时间：2018/5/14 17:54 <br/>
  */
-public class PostFormBuilder extends OkHttpRequestBuilder<PostFormBuilder> implements HasParamsable, HasHeadersable {
+public class PostFormBuilder extends OkHttpRequestBuilder<PostFormBuilder> implements HasParameters<PostFormBuilder>, HasHeaders<PostFormBuilder> {
     /**
      * get参数
      */
@@ -80,7 +80,7 @@ public class PostFormBuilder extends OkHttpRequestBuilder<PostFormBuilder> imple
         if (queryParams != null && !queryParams.isEmpty()) {
             myUrl = appendParams(myUrl, queryParams);
         }
-        return new PostFormRequest(myUrl, tag, params, headers, id, isShowDialog, isShowToast).build();
+        return new PostFormRequest(myUrl, this).build();
     }
 
     /**

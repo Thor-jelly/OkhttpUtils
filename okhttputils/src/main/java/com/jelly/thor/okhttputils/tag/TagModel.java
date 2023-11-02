@@ -5,7 +5,7 @@ package com.jelly.thor.okhttputils.tag;
  * 创建人：吴冬冬<br/>
  * 创建时间：2018/5/16 15:41 <br/>
  */
-public class TagBeen {
+public class TagModel {
     /**
      * 默认tag
      */

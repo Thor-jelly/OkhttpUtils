@@ -8,11 +8,11 @@ import androidx.annotation.Nullable;
 import com.jelly.thor.okhttputils.OkHttpUtils;
 import com.jelly.thor.okhttputils.callback.Callback;
 import com.jelly.thor.okhttputils.callback.ParseDataUtils;
+import com.jelly.thor.okhttputils.exception.ResponseException;
+import com.jelly.thor.okhttputils.exception.ServerException;
 import com.jelly.thor.okhttputils.utils.CommontUtils;
 import com.jelly.thor.okhttputils.utils.ErrorCode;
 import com.jelly.thor.okhttputils.utils.Platform;
-import com.jushuitan.jht.basemodule.utils.net.exception.ResponseException;
-import com.jushuitan.jht.basemodule.utils.net.exception.ServerException;
 
 import java.io.IOException;
 import java.util.Map;
@@ -70,7 +70,7 @@ public class RequestCall {
             if (emitter == null) {
                 callback.mOkHttpRequest = mOkHttpRequest;
                 //失败回调 主线程中
-                sendOkHttpFail(mOkHttpRequest.id, ErrorCode.NET_ERROR, errorStr, callback);
+                sendOkHttpFail(mOkHttpRequest.okHttpRequestBuilder.getId(), ErrorCode.NET_ERROR, errorStr, callback);
             } else {
                 if (emitter.isDisposed()) {
                     return;
@@ -86,7 +86,7 @@ public class RequestCall {
             Platform.get().execute(new Runnable() {
                 @Override
                 public void run() {
-                    callback.onBefore(mOkHttpRequest.getId());
+                    callback.onBefore(mOkHttpRequest.okHttpRequestBuilder.getId());
                 }
             });
         }
@@ -97,7 +97,7 @@ public class RequestCall {
             mRequest = mOkHttpRequest.getRequest();
         } catch (IllegalArgumentException e) {
             //失败回调 主线程中
-            sendOkHttpFail(mOkHttpRequest.getId(), ErrorCode.PARAMS_EXCEPTION, mRequest.url().toString() + "添加参数异常 " + e.getMessage(), callback);
+            sendOkHttpFail(mOkHttpRequest.okHttpRequestBuilder.getId(), ErrorCode.PARAMS_EXCEPTION, mRequest.url().toString() + "添加参数异常 " + e.getMessage(), callback);
             return;
         }
 
@@ -137,7 +137,7 @@ public class RequestCall {
                 String key = entry.getKey();
                 String value = entry.getValue();
                 if (value == null) {
-                    sendOkHttpFail(mOkHttpRequest.getId(), ErrorCode.PARAMS_EXCEPTION, mRequest.url().toString() + "addChangeCommonParameters参数异常 " + "参数中的" + key + " 赋值为null", callback);
+                    sendOkHttpFail(mOkHttpRequest.okHttpRequestBuilder.getId(), ErrorCode.PARAMS_EXCEPTION, mRequest.url().toString() + "addChangeCommonParameters参数异常 " + "参数中的" + key + " 赋值为null", callback);
                     return;
                 }
                 newUrl.addQueryParameter(key, value);
@@ -164,12 +164,12 @@ public class RequestCall {
                     call.cancel();
                 }
                 //失败回调 主线程中
-                sendOkHttpFail(mOkHttpRequest.getId(), ErrorCode.NET_ERROR, "网络异常！", callback);
+                sendOkHttpFail(mOkHttpRequest.okHttpRequestBuilder.getId(), ErrorCode.NET_ERROR, "网络异常！", callback);
             }
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) {
-                final int id = mOkHttpRequest.id;
+                final int id = mOkHttpRequest.okHttpRequestBuilder.getId();
                 //在子线程中
                 if (call.isCanceled()) {
                     String errorStr = "网络被取消！";

@@ -72,7 +72,7 @@ public class MyApplication extends Application {
                 .hostnameVerifier(new HttpsUtils.UnSafeHostnameVerifier())
                 .build();
 
-        OkHttpUtils.initClient(okHttpClient, new ParseDataImpl());
+        OkHttpUtils.initClient(okHttpClient).setIParseData(new ParseDataImpl());
 
         //OkHttpUtils.getInstance().setBaseUrl("https://b.shandian.net/pos/");
         LinkedHashMap<String, String> m = new LinkedHashMap<>();
