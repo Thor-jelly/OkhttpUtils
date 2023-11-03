@@ -2,12 +2,13 @@ package com.jelly.thor.okhttputils.converters.gson
 
 import com.google.gson.Gson
 import com.google.gson.internal.`$Gson$Types`
+import com.google.gson.reflect.TypeToken
 import com.jelly.thor.okhttputils.callback.ParseDataUtils
 import com.jelly.thor.okhttputils.converters.Converter
 import com.jelly.thor.okhttputils.converters.IRefParamsType
+import com.jelly.thor.okhttputils.exception.ResponseException
 import com.jelly.thor.okhttputils.model.ResponseModel
 import com.jelly.thor.okhttputils.utils.ErrorCode
-import com.jelly.thor.okhttputils.exception.ResponseException
 import okhttp3.Request
 import okhttp3.Response
 import java.lang.reflect.ParameterizedType
@@ -89,11 +90,7 @@ class GsonResponseBodyConverter<T>(private val gson: Gson) : Converter {
             try {
                 gson.fromJson<ResponseModel<T>>(
                     responseStr,
-                    `$Gson$Types`.newParameterizedTypeWithOwner(
-                        null,
-                        ResponseModel::class.java,
-                        clazz
-                    )
+                    TypeToken.getParameterized(ResponseModel::class.java, clazz).type
                 )
             } catch (e: Exception) {
                 //Timber.tag("123===").e("url:${response.request.url} \n $e")
