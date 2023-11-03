@@ -1,6 +1,8 @@
 package com.jelly.thor.okhttputils.converters.gson
 
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.ToNumberPolicy
 import com.jelly.thor.okhttputils.converters.Converter
 import com.jelly.thor.okhttputils.converters.IRefParamsType
 import okhttp3.Request
@@ -15,7 +17,13 @@ class GsonConverterFactory(private val gson: Gson) : Converter.Factory() {
     companion object {
         @JvmStatic
         fun create(): GsonConverterFactory {
-            return GsonConverterFactory(Gson());
+            val gson = GsonBuilder().setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE).create()
+            return GsonConverterFactory(gson);
+        }
+
+        @JvmStatic
+        fun create(gson: Gson): GsonConverterFactory {
+            return GsonConverterFactory(gson);
         }
     }
 
