@@ -64,22 +64,7 @@ public class PostFileBuilder extends OkHttpRequestBuilder<PostFileBuilder> imple
 
     @Override
     public RequestCall build() {
-        String myUrl;
-        if (baseUrl != null) {
-            if (URLUtil.isValidUrl(url)) {
-                myUrl = url;
-            } else {
-                myUrl = baseUrl + url;
-            }
-        } else if (OkHttpUtils.getInstance().getBaseUrl() != null) {
-            if (URLUtil.isValidUrl(url)) {
-                myUrl = url;
-            } else {
-                myUrl = OkHttpUtils.getInstance().getBaseUrl() + url;
-            }
-        } else {
-            myUrl = url;
-        }
+        String myUrl = getNewUrl();
         return new PostFileRequest(myUrl, file, this).build();
     }
 

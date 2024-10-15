@@ -10,8 +10,6 @@ android {
 //        applicationId "com.example.okhttputils"
         minSdkVersion 21
         targetSdkVersion 34
-        versionCode 37
-        versionName "1.1.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -24,11 +22,11 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17
+        jvmTarget = "21"
     }
 
 //    //以下为配置library注释在打包jar后保留
@@ -57,21 +55,21 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.annotation:annotation:1.7.0'
+    implementation 'androidx.annotation:annotation:1.8.2'
     //kotlin
-    implementation 'androidx.core:core-ktx:1.12.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.9.10"
+    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation "org.jetbrains.kotlin:kotlin-reflect:2.0.20"
+    //协程
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     //okhttp
     implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.2'
     //gson
-    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.google.code.gson:gson:2.11.0'
     //rxjava
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.2'
-    implementation 'io.reactivex.rxjava3:rxjava:3.1.6'
+    implementation 'io.reactivex.rxjava3:rxjava:3.1.9'
     //fastjson
-    implementation 'com.alibaba:fastjson:1.2.80'
-    implementation 'com.alibaba:fastjson:1.2.80.android'
-    implementation "org.jetbrains.kotlin:kotlin-reflect:1.8.22"
+    implementation 'com.alibaba:fastjson:1.2.83'
 }
 
 //apply plugin: 'maven'
