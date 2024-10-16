@@ -20,7 +20,7 @@ object PostApi {
             .url(ApiUrlConstant.getApiUrl("test/test"))
             .params(JsonParamsUtils.builder().build())
             .build()
-            .rxJava
+            .rxJava()
             .dataConversion<RxJavaTestModel>()
     }
 
@@ -30,7 +30,7 @@ object PostApi {
             .url(ApiUrlConstant.getApiUrl("test/test"))
             .params(JsonParamsUtils.builder().build())
             .build()
-            .rxJava
+            .rxJava()
             .dataConversion<String>()
     }
 
@@ -40,7 +40,7 @@ object PostApi {
             .url(ApiUrlConstant.getApiUrl("test/test"))
             .params(JsonParamsUtils.builder().build())
             .build()
-            .rxJava
+            .rxJava()
             .dataConversion<ResponseModel<String>>()
     }
 
@@ -50,7 +50,7 @@ object PostApi {
             .url(ApiUrlConstant.getApiUrl("test/test"))
             .params(JsonParamsUtils.builder().build())
             .build()
-            .rxJava
+            .rxJava()
             .dataConversion<Response>()
     }
 
@@ -60,7 +60,7 @@ object PostApi {
             .url(ApiUrlConstant.getApiUrl("test/test"))
             .params(JsonParamsUtils.builder().build())
             .build()
-            .rxJava
+            .rxJava()
             .dataConversion<List<RxJavaTestCModel>>()
     }
 
@@ -70,7 +70,6 @@ object PostApi {
             .url(ApiUrlConstant.getApiUrl("test/test"))
             .params(JsonParamsUtils.builder().build())
             .build()
-            .rxJava
-            .dataConversion<ResponseModel<PagerModel>>()
+            .asRxJava<ResponseModel<PagerModel>>()
     }
 }
