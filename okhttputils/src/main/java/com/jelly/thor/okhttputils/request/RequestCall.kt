@@ -33,8 +33,7 @@ import kotlin.coroutines.resumeWithException
  */
 class RequestCall internal constructor(okHttpRequest: OkHttpRequest) {
     private val mOkHttpRequest: OkHttpRequest
-    var mRequest: Request? = null
-        private set
+
     private var mCall: Call? = null
 
     init {
@@ -49,10 +48,10 @@ class RequestCall internal constructor(okHttpRequest: OkHttpRequest) {
         return withContext(Dispatchers.Default) {
             try {
                 val converterFactory = OkHttpUtils.getInstance().converterFactory
-                val parseData = converterFactory.responseBodyConverter(0, object : RefParamsType<T>() {}, mRequest, response, T::class.java)
+                val parseData = converterFactory.responseBodyConverter(0, object : RefParamsType<T>() {}, response.request, response, T::class.java)
                 parseData
             } catch (e: kotlin.Exception) {
-                val error = ParseDataUtils.handleError(e, mRequest)
+                val error = ParseDataUtils.handleError(e, response.request)
                 throw error
             }
         }
@@ -163,11 +162,12 @@ class RequestCall internal constructor(okHttpRequest: OkHttpRequest) {
 
         val okHttpClient = OkHttpUtils.getInstance().getOkHttpClient()
 
+        var request: Request
         try {
-            mRequest = mOkHttpRequest.getRequest()
+            request = mOkHttpRequest.getRequest()
         } catch (e: IllegalArgumentException) {
             //失败回调 主线程中
-            val errorStr = mRequest!!.url.toString() + "添加参数异常 " + e.message
+            val errorStr = mOkHttpRequest.url.toString() + "添加参数异常 " + e.message
             if (converterCallback == null) {
                 sendOkHttpFail<T?>(mOkHttpRequest.okHttpRequestBuilder.getId(), ErrorCode.PARAMS_EXCEPTION, errorStr, callback)
             } else {
@@ -179,10 +179,10 @@ class RequestCall internal constructor(okHttpRequest: OkHttpRequest) {
         //动态追加的公共参数
         val changeCommonParameters = callback?.addChangeCommonParameters()
         if (changeCommonParameters != null && !changeCommonParameters.isEmpty()) {
-            val method = mRequest!!.method
+            val method = request.method
             //            switch (method) {
 //                case "POST":
-//                    RequestBody body = mRequest.body();
+//                    RequestBody body = request.body();
 //                    if (body instanceof FormBody) {
 //                        //键值对形式
 //                        FormBody.Builder newFormBody = new FormBody.Builder();
@@ -197,7 +197,7 @@ class RequestCall internal constructor(okHttpRequest: OkHttpRequest) {
 //                        }
 //                        //重新创建一个新的request
 //                        FormBody build = newFormBody.build();
-//                        Request newRequest = mRequest.newBuilder()
+//                        Request newRequest = request.newBuilder()
 //                                .post(build)
 //                                .build();
 //                        mCall = okHttpClient.newCall(newRequest);
@@ -207,22 +207,22 @@ class RequestCall internal constructor(okHttpRequest: OkHttpRequest) {
 //                    }
 //                    break;
 //                default:
-            val newUrl: HttpUrl.Builder = mRequest!!.url.newBuilder()
+            val newUrl: HttpUrl.Builder = request.url.newBuilder()
             for (entry in changeCommonParameters.entries) {
                 val key: String = entry.key!!
                 val value = entry.value
                 if (value == null) {
-                    sendOkHttpFail<T?>(mOkHttpRequest.okHttpRequestBuilder.getId(), ErrorCode.PARAMS_EXCEPTION, mRequest!!.url.toString() + "addChangeCommonParameters参数异常 " + "参数中的" + key + " 赋值为null", callback)
+                    sendOkHttpFail<T?>(mOkHttpRequest.okHttpRequestBuilder.getId(), ErrorCode.PARAMS_EXCEPTION, request.url.toString() + "addChangeCommonParameters参数异常 " + "参数中的" + key + " 赋值为null", callback)
                     return
                 }
                 newUrl.addQueryParameter(key, value)
             }
-            val newRequest: Request = mRequest!!.newBuilder().url(newUrl.build()).build()
+            val newRequest: Request = request.newBuilder().url(newUrl.build()).build()
             mCall = okHttpClient.newCall(newRequest)
             //                    break;
 //            }
         } else {
-            mCall = okHttpClient.newCall(mRequest!!)
+            mCall = okHttpClient.newCall(request)
         }
 
 
