@@ -14,6 +14,16 @@ import com.jelly.thor.okhttputils.utils.Platform
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.functions.Action
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.onFailure
+import kotlinx.coroutines.channels.onSuccess
+import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import okhttp3.Call
@@ -34,27 +44,85 @@ import kotlin.coroutines.resumeWithException
 class RequestCall internal constructor(okHttpRequest: OkHttpRequest) {
     private val mOkHttpRequest: OkHttpRequest
 
-    private var mCall: Call? = null
-
     init {
         this.mOkHttpRequest = okHttpRequest
+    }
+
+    private var mCall: Call? = null
+
+    var mRequest: Request? = null
+        private set
+
+    /**
+     * flow模式
+     */
+    inline fun <reified T : Any> asFlow() {
+        flow()
+            .flowOn(Dispatchers.Main)
+            .map {
+                getModel<T>(it)
+            }.catch {
+                val error = ParseDataUtils.handleError(it, mRequest)
+                throw error
+            }.flowOn(Dispatchers.Default)
+    }
+
+    /**
+     * flow模式
+     */
+    fun flow(): Flow<Response> {
+        return callbackFlow<Response> {
+            execute<Response>(object : ConverterCallback() {
+                override fun onError(e: kotlin.Exception) {
+                    if (!this@callbackFlow.isActive) {
+                        return
+                    }
+                    close(e)
+                }
+
+                override fun onSuccess(response: Response) {
+                    if (!this@callbackFlow.isActive) {
+                        return
+                    }
+                    trySendBlocking(response)
+                        .onSuccess {
+                            close()
+                        }.onFailure {
+                            close(it)
+                        }
+                }
+            }, null)
+
+            awaitClose {
+                mCall?.run {
+                    if (this.isCanceled()) {
+                        return@run
+                    }
+                    this.cancel()
+                }
+            }
+        }
     }
 
     /**
      * 协程模式
      */
     suspend inline fun <reified T : Any> asCoroutines(): T {
-        val response = coroutines()
-        return withContext(Dispatchers.Default) {
-            try {
-                val converterFactory = OkHttpUtils.getInstance().converterFactory
-                val parseData = converterFactory.responseBodyConverter(0, object : RefParamsType<T>() {}, response.request, response, T::class.java)
-                parseData
-            } catch (e: kotlin.Exception) {
-                val error = ParseDataUtils.handleError(e, response.request)
-                throw error
+        return try {
+            val response = coroutines()
+            withContext(Dispatchers.Default) {
+                getModel<T>(response)
             }
+        } catch (e: kotlin.Exception) {
+            val error = ParseDataUtils.handleError(e, mRequest)
+            throw error
         }
+    }
+
+    inline fun <reified T : Any> getModel(response: Response): T {
+        val converterFactory = OkHttpUtils.getInstance().converterFactory
+        val parseData = converterFactory.responseBodyConverter(0, object : RefParamsType<T>() {}, response.request, response, T::class.java)
+        return parseData
     }
 
     /**
@@ -77,7 +145,6 @@ class RequestCall internal constructor(okHttpRequest: OkHttpRequest) {
                     continuation.resume(response)
                 }
             }, null)
-
 
             //支持协程取消请求
             continuation.invokeOnCancellation {
@@ -162,9 +229,8 @@ class RequestCall internal constructor(okHttpRequest: OkHttpRequest) {
 
         val okHttpClient = OkHttpUtils.getInstance().getOkHttpClient()
 
-        var request: Request
         try {
-            request = mOkHttpRequest.getRequest()
+            mRequest = mOkHttpRequest.getRequest()
         } catch (e: IllegalArgumentException) {
             //失败回调 主线程中
             val errorStr = mOkHttpRequest.url.toString() + "添加参数异常 " + e.message
@@ -179,7 +245,7 @@ class RequestCall internal constructor(okHttpRequest: OkHttpRequest) {
         //动态追加的公共参数
         val changeCommonParameters = callback?.addChangeCommonParameters()
         if (changeCommonParameters != null && !changeCommonParameters.isEmpty()) {
-            val method = request.method
+            val method = mRequest!!.method
             //            switch (method) {
 //                case "POST":
 //                    RequestBody body = request.body();
@@ -207,22 +273,22 @@ class RequestCall internal constructor(okHttpRequest: OkHttpRequest) {
 //                    }
 //                    break;
 //                default:
-            val newUrl: HttpUrl.Builder = request.url.newBuilder()
+            val newUrl: HttpUrl.Builder = mRequest!!.url.newBuilder()
             for (entry in changeCommonParameters.entries) {
                 val key: String = entry.key!!
                 val value = entry.value
                 if (value == null) {
-                    sendOkHttpFail<T?>(mOkHttpRequest.okHttpRequestBuilder.getId(), ErrorCode.PARAMS_EXCEPTION, request.url.toString() + "addChangeCommonParameters参数异常 " + "参数中的" + key + " 赋值为null", callback)
+                    sendOkHttpFail<T?>(mOkHttpRequest.okHttpRequestBuilder.getId(), ErrorCode.PARAMS_EXCEPTION, mRequest!!.url.toString() + "addChangeCommonParameters参数异常 " + "参数中的" + key + " 赋值为null", callback)
                     return
                 }
                 newUrl.addQueryParameter(key, value)
             }
-            val newRequest: Request = request.newBuilder().url(newUrl.build()).build()
+            val newRequest: Request = mRequest!!.newBuilder().url(newUrl.build()).build()
             mCall = okHttpClient.newCall(newRequest)
             //                    break;
 //            }
         } else {
-            mCall = okHttpClient.newCall(request)
+            mCall = okHttpClient.newCall(mRequest!!)
         }
 
 
