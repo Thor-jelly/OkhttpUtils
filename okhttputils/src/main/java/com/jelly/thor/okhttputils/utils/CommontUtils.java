@@ -27,6 +27,7 @@ public class CommontUtils {
     /**
      * 判断当前是否有网络
      */
+    @SuppressLint("MissingPermission")
     public static boolean networkAvailable() {
         Context context = GetApplication.get().getApplicationContext();
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -46,7 +47,6 @@ public class CommontUtils {
                 return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
                         && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
             } else {
-                @SuppressLint("MissingPermission")
                 NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
                 return activeNetworkInfo != null && activeNetworkInfo.isConnected();
             }
