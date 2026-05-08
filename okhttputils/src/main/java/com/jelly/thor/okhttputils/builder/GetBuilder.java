@@ -1,14 +1,10 @@
 package com.jelly.thor.okhttputils.builder;
 
-import android.net.Uri;
-
 import com.jelly.thor.okhttputils.OkHttpUtils;
 import com.jelly.thor.okhttputils.request.GetRequest;
 import com.jelly.thor.okhttputils.request.RequestCall;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 import androidx.annotation.NonNull;
 
@@ -37,55 +33,27 @@ public class GetBuilder extends OkHttpRequestBuilder<GetBuilder> implements HasP
         return new GetRequest(newUrl, this).build();
     }
 
-    /**
-     * 拼接url和参数
-     */
-    private String appendParams(String url, Map<String, String> params) {
-        if (url == null || params == null || params.isEmpty()) {
-            return url;
-        }
-        Uri.Builder builder = Uri.parse(url).buildUpon();
-        Set<String> keys = params.keySet();
-        for (String key : keys) {
-            builder.appendQueryParameter(key, params.get(key));
-        }
-        return builder.build().toString();
-    }
-
-
     @Override
     public GetBuilder params(@NonNull Map<String, String> params) {
-        if (this.params == null) {
-            this.params = new LinkedHashMap<>();
-        }
-        this.params.putAll(params);
+        initParamsIfNeeded().putAll(params);
         return this;
     }
 
     @Override
     public GetBuilder addParam(@NonNull String key, @NonNull String value) {
-        if (this.params == null) {
-            this.params = new LinkedHashMap<>();
-        }
-        params.put(key, value);
+        initParamsIfNeeded().put(key, value);
         return this;
     }
 
     @Override
     public GetBuilder headers(@NonNull Map<String, String> headers) {
-        if (this.headers == null) {
-            this.headers = new LinkedHashMap<>();
-        }
-        this.headers.putAll(headers);
+        initHeadersIfNeeded().putAll(headers);
         return this;
     }
 
     @Override
     public GetBuilder addHeader(@NonNull String key, @NonNull String value) {
-        if (this.headers == null) {
-            this.headers = new LinkedHashMap<>();
-        }
-        this.headers.put(key, value);
+        initHeadersIfNeeded().put(key, value);
         return this;
     }
 }

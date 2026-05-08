@@ -5,10 +5,10 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.7.1'
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.20'
+        classpath 'com.android.tools.build:gradle:9.2.1'
+        // AGP 9.x 内置 Kotlin 支持，不再需要单独的 kotlin-gradle-plugin
         // vanniktech 发布插件
-        classpath 'com.vanniktech:gradle-maven-publish-plugin:0.26.0'
+        classpath 'com.vanniktech:gradle-maven-publish-plugin:0.36.0'
     }
 }
 

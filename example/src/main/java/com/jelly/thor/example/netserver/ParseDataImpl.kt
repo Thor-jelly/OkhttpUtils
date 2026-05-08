@@ -64,7 +64,11 @@ class ParseDataImpl : IParseData {
             }
         }
 
-        return response as T
+        //接口返回数据格式不包含"code"字段，如果目标类型是Response或Any则直接返回，否则抛出解析异常
+        if (Response::class.java.isAssignableFrom(clazz ?: Any::class.java) || clazz == Any::class.java) {
+            return response as T
+        }
+        throw ServerException(ErrorCode.PARSE_ERROR, "数据解析异常，返回格式不匹配")
     }
 
     //新网关处理cookie

@@ -4,11 +4,13 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
+import android.os.Build;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.FileNameMap;
@@ -22,52 +24,73 @@ import java.util.Map;
  * 创建时间：2018/5/15 10:37 <br/>
  */
 public class CommontUtils {
-//    public static void aa() {
-//        OkHttpUtils.getWebSocket().newBuild().execute();
-//    }
-
     /**
      * 判断当前是否有网络
      */
     public static boolean networkAvailable() {
         Context context = GetApplication.get().getApplicationContext();
-        //得到链接管理器对象
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager == null) {
             return false;
         }
-        @SuppressLint("MissingPermission")
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Network network = connectivityManager.getActiveNetwork();
+                if (network == null) {
+                    return false;
+                }
+                NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(network);
+                if (capabilities == null) {
+                    return false;
+                }
+                return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                        && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
+            } else {
+                @SuppressLint("MissingPermission")
+                NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+                return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+            }
+        } catch (Exception e) {
+            // 权限不足或其他异常时返回false
+            return false;
+        }
     }
 
     /**
      * 获取文件名MimeType
      */
     public static String guessMimeType(String path) {
+        if (path == null || path.isEmpty()) {
+            return "image/png";
+        }
         FileNameMap fileNameMap = URLConnection.getFileNameMap();
-        String contentTypeFor = null;
         try {
-            contentTypeFor = fileNameMap.getContentTypeFor(URLEncoder.encode(path, "UTF-8"));
+            String contentType = fileNameMap.getContentTypeFor(URLEncoder.encode(path, "UTF-8"));
+            return contentType != null ? contentType : "image/png";
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            // UTF-8 应该总是支持的，但为了安全起见
+            return "image/png";
         }
-        if (contentTypeFor == null) {
-            contentTypeFor = "image/png";
-        }
-        return contentTypeFor;
     }
 
+    /**
+     * 获取当前Activity（使用反射，性能较差，建议谨慎使用）
+     * @deprecated 此方法使用反射，性能较差，且在不同Android版本可能失效，建议使用其他方式获取Activity
+     */
+    @Deprecated
     public static Activity getActivity() {
-        Class activityThreadClass = null;
         try {
-            activityThreadClass = Class.forName("android.app.ActivityThread");
+            Class<?> activityThreadClass = Class.forName("android.app.ActivityThread");
             Object activityThread = activityThreadClass.getMethod("currentActivityThread").invoke(null);
             Field activitiesField = activityThreadClass.getDeclaredField("mActivities");
             activitiesField.setAccessible(true);
-            Map activities = (Map) activitiesField.get(activityThread);
+            @SuppressWarnings("unchecked")
+            Map<Object, Object> activities = (Map<Object, Object>) activitiesField.get(activityThread);
+            if (activities == null) {
+                return null;
+            }
             for (Object activityRecord : activities.values()) {
-                Class activityRecordClass = activityRecord.getClass();
+                Class<?> activityRecordClass = activityRecord.getClass();
                 Field pausedField = activityRecordClass.getDeclaredField("paused");
                 pausedField.setAccessible(true);
                 if (!pausedField.getBoolean(activityRecord)) {
@@ -76,16 +99,8 @@ public class CommontUtils {
                     return (Activity) activityField.get(activityRecord);
                 }
             }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            // 反射失败，返回null
         }
         return null;
     }

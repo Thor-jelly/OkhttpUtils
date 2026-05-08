@@ -1,11 +1,13 @@
 package com.jelly.thor.okhttputils.builder;
 
+import android.net.Uri;
 import android.text.TextUtils;
 import android.webkit.URLUtil;
 
 import com.jelly.thor.okhttputils.OkHttpUtils;
 import com.jelly.thor.okhttputils.request.RequestCall;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -85,24 +87,24 @@ public abstract class OkHttpRequestBuilder<T extends OkHttpRequestBuilder<T>> {
     /**
      * 网络请求域名拼接生成新的url
      */
-    protected String getNewUrl(){
-        String newUrl;
-        if (!TextUtils.isEmpty(baseUrl)) {
-            if (URLUtil.isValidUrl(url)) {
-                newUrl = url;
-            } else {
-                newUrl = baseUrl + url;
-            }
-        } else if (!TextUtils.isEmpty(OkHttpUtils.getInstance().getBaseUrl())) {
-            if (URLUtil.isValidUrl(url)) {
-                newUrl = url;
-            } else {
-                newUrl = OkHttpUtils.getInstance().getBaseUrl() + url;
-            }
-        } else {
-            newUrl = url;
+    protected String getNewUrl() {
+        if (TextUtils.isEmpty(url)) {
+            return url;
         }
-        return newUrl;
+        // 如果url已经是完整URL，直接返回
+        if (URLUtil.isValidUrl(url)) {
+            return url;
+        }
+        // 优先使用builder设置的baseUrl
+        String effectiveBaseUrl = !TextUtils.isEmpty(baseUrl) 
+            ? baseUrl 
+            : OkHttpUtils.getInstance().getBaseUrl();
+        // 如果baseUrl为空，直接返回url
+        if (TextUtils.isEmpty(effectiveBaseUrl)) {
+            return url;
+        }
+        // 拼接baseUrl和url
+        return effectiveBaseUrl + url;
     }
 
     ///////////////////////GET/////////////////////////////////
@@ -136,5 +138,39 @@ public abstract class OkHttpRequestBuilder<T extends OkHttpRequestBuilder<T>> {
 
     public boolean getIsShowToast() {
         return isShowToast;
+    }
+
+    /**
+     * 拼接url和参数（公共方法，供子类使用）
+     */
+    protected String appendParams(String url, Map<String, String> params) {
+        if (url == null || params == null || params.isEmpty()) {
+            return url;
+        }
+        Uri.Builder builder = Uri.parse(url).buildUpon();
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            builder.appendQueryParameter(entry.getKey(), entry.getValue());
+        }
+        return builder.build().toString();
+    }
+
+    /**
+     * 初始化params Map（供HasParameters接口实现类使用）
+     */
+    protected Map<String, String> initParamsIfNeeded() {
+        if (this.params == null) {
+            this.params = new LinkedHashMap<>();
+        }
+        return this.params;
+    }
+
+    /**
+     * 初始化headers Map（供HasHeaders接口实现类使用）
+     */
+    protected Map<String, String> initHeadersIfNeeded() {
+        if (this.headers == null) {
+            this.headers = new LinkedHashMap<>();
+        }
+        return this.headers;
     }
 }

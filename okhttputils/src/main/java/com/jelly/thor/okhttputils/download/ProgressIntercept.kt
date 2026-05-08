@@ -3,7 +3,6 @@ package com.jelly.thor.okhttputils.download
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
-import okhttp3.ResponseBody
 
 /**
  * 类描述：文件进度拦截器 <br/>
@@ -58,9 +57,9 @@ class ProgressIntercept private constructor() : Interceptor {
         if (downloadListener == null) {
             return oldResponse
         }
-        val body = oldResponse.body ?: oldResponse
+        val body = oldResponse.body ?: return oldResponse
         return oldResponse.newBuilder()
-            .body(ProgressResponseBody(body as ResponseBody, downloadListener))
+            .body(ProgressResponseBody(body, downloadListener))
             .build()
     }
 }

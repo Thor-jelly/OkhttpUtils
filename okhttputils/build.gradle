@@ -1,16 +1,15 @@
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
     id 'kotlin-parcelize'
     id 'com.vanniktech.maven.publish'
 }
 
 android {
-    compileSdk 34
+    compileSdk 36
     defaultConfig {
 //        applicationId "com.example.okhttputils"
-        minSdkVersion 21
-        targetSdkVersion 34
+        minSdkVersion 23
+        targetSdkVersion 36
         versionCode 38
         versionName "1.2.0"
 
@@ -20,16 +19,19 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_21
         targetCompatibility JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = "21"
+    kotlin {
+        jvmToolchain(21)
     }
 
 //    //以下为配置library注释在打包jar后保留
@@ -58,19 +60,20 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.annotation:annotation:1.8.2'
+    implementation 'androidx.annotation:annotation:1.10.0'
     //kotlin
-    implementation 'androidx.core:core-ktx:1.13.1'
-    implementation "org.jetbrains.kotlin:kotlin-reflect:2.0.20"
+    implementation 'androidx.core:core-ktx:1.18.0'
+    implementation "org.jetbrains.kotlin:kotlin-reflect:2.2.20"
     //协程
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
     //okhttp
-    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.2'
+    implementation 'com.squareup.okhttp3:okhttp:5.3.2'
     //gson
-    implementation 'com.google.code.gson:gson:2.11.0'
+    implementation 'com.google.code.gson:gson:2.14.0'
     //rxjava
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.2'
-    implementation 'io.reactivex.rxjava3:rxjava:3.1.9'
+    implementation 'io.reactivex.rxjava3:rxjava:3.1.12'
     //fastjson
     implementation 'com.alibaba:fastjson:1.2.83'
 }

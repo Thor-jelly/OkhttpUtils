@@ -1,7 +1,7 @@
 package com.jelly.thor.okhttputils.converters.gson
 
 import com.google.gson.Gson
-import com.google.gson.internal.`$Gson$Types`
+import com.google.gson.internal.GsonTypes
 import com.google.gson.reflect.TypeToken
 import com.jelly.thor.okhttputils.callback.ParseDataUtils
 import com.jelly.thor.okhttputils.converters.Converter
@@ -24,7 +24,7 @@ class GsonResponseBodyConverter<T>(private val gson: Gson) : Converter {
         p: IRefParamsType<T>,
         request: Request?,
         response: Response,
-        responseClazz: Class<T>?
+        responseClazz: Class<T>?,
     ): T {
         val genericSuperclass = p.javaClass.genericSuperclass
         if (genericSuperclass !is ParameterizedType) {
@@ -44,9 +44,9 @@ class GsonResponseBodyConverter<T>(private val gson: Gson) : Converter {
             return parseData
         }
         if (ResponseModel::class.java.canonicalName == (type.rawType as Class<*>).canonicalName) {
-            val getPTypeImpl = `$Gson$Types`.newParameterizedTypeWithOwner(
+            val getPTypeImpl = GsonTypes.newParameterizedTypeWithOwner(
                 type.ownerType,
-                type.rawType,
+                type.rawType as Class<*>,
                 *type.actualTypeArguments
             )
             val parseData = ParseDataUtils.parseData<T>(
@@ -57,12 +57,12 @@ class GsonResponseBodyConverter<T>(private val gson: Gson) : Converter {
             )
             return parseData
         } else {
-            val inTypeParamsImpl = `$Gson$Types`.newParameterizedTypeWithOwner(
+            val inTypeParamsImpl = GsonTypes.newParameterizedTypeWithOwner(
                 type.ownerType,
-                type.rawType,
+                type.rawType as Class<*>,
                 *type.actualTypeArguments
             )
-            val outTypeParamsImpl = `$Gson$Types`.newParameterizedTypeWithOwner(
+            val outTypeParamsImpl = GsonTypes.newParameterizedTypeWithOwner(
                 null,
                 ResponseModel::class.java,
                 *arrayOf(inTypeParamsImpl),
@@ -77,7 +77,7 @@ class GsonResponseBodyConverter<T>(private val gson: Gson) : Converter {
         response: Response,
         responseStr: String?,
         clazz: Class<*>?,
-        parameterizedTypeImpl: Type?
+        parameterizedTypeImpl: Type?,
     ): Any {
         val model = if (parameterizedTypeImpl != null) {
             try {

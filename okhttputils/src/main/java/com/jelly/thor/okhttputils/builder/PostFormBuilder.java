@@ -1,7 +1,5 @@
 package com.jelly.thor.okhttputils.builder;
 
-import android.net.Uri;
-
 import androidx.annotation.NonNull;
 
 import com.jelly.thor.okhttputils.request.PostFormRequest;
@@ -9,7 +7,6 @@ import com.jelly.thor.okhttputils.request.RequestCall;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 类描述：post build <br/>
@@ -40,37 +37,25 @@ public class PostFormBuilder extends OkHttpRequestBuilder<PostFormBuilder> imple
 
     @Override
     public PostFormBuilder params(@NonNull Map<String, String> params) {
-        if (this.params == null) {
-            this.params = new LinkedHashMap<>();
-        }
-        this.params.putAll(params);
+        initParamsIfNeeded().putAll(params);
         return this;
     }
 
     @Override
     public PostFormBuilder addParam(@NonNull String key, @NonNull String value) {
-        if (this.params == null) {
-            params = new LinkedHashMap<>();
-        }
-        params.put(key, value);
+        initParamsIfNeeded().put(key, value);
         return this;
     }
 
     @Override
     public PostFormBuilder headers(@NonNull Map<String, String> headers) {
-        if (this.headers == null) {
-            this.headers = new LinkedHashMap<>();
-        }
-        this.headers.putAll(headers);
+        initHeadersIfNeeded().putAll(headers);
         return this;
     }
 
     @Override
     public PostFormBuilder addHeader(@NonNull String key, @NonNull String value) {
-        if (this.headers == null) {
-            this.headers = new LinkedHashMap<>();
-        }
-        this.headers.put(key, value);
+        initHeadersIfNeeded().put(key, value);
         return this;
     }
 
@@ -81,20 +66,5 @@ public class PostFormBuilder extends OkHttpRequestBuilder<PostFormBuilder> imple
             myUrl = appendParams(myUrl, queryParams);
         }
         return new PostFormRequest(myUrl, this).build();
-    }
-
-    /**
-     * 拼接url和参数
-     */
-    private String appendParams(String url, Map<String, String> params) {
-        if (null == url || null == params || params.isEmpty()) {
-            return url;
-        }
-        Uri.Builder builder = Uri.parse(url).buildUpon();
-        Set<String> keys = params.keySet();
-        for (String key : keys) {
-            builder.appendQueryParameter(key, params.get(key));
-        }
-        return builder.build().toString();
     }
 }

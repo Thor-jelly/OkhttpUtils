@@ -87,7 +87,7 @@ public class OkHttpUtils {
             throw new Error("请先在Application中初始化OkHttpClient, 调用OkHttpUtils.getInstance()或者OkHttpUtils.initClient()方法!");
         }
         if (mIParseData == null) {
-            throw new Error("请先在Application中初始化OkHttpClient, 调用OkHttpUtils.getInstance().setIParseData()或者OkHttpUtils.initClient()方法!");
+            throw new Error("请先在Application中初始化IParseData, 调用OkHttpUtils.getInstance().setIParseData()方法!");
         }
         return mOkHttpClient;
     }
@@ -181,67 +181,68 @@ public class OkHttpUtils {
      * 取消所有网络请求
      */
     public void cancelAll() {
-        if (mOkHttpClient == null) {
-            throw new Error("请先初始化OkHttpClient, 调用OkHttpUtils.getInstance()或者OkHttpUtils.initClient()方法!");
-        }
-        for (Call call : mOkHttpClient.dispatcher().queuedCalls()) {
-            if (call.isCanceled()) {
-                continue;
-            }
-            call.cancel();
-        }
-        for (Call call : mOkHttpClient.dispatcher().runningCalls()) {
-            if (call.isCanceled()) {
-                continue;
-            }
-            call.cancel();
-        }
+        checkOkHttpClientInitialized();
+        cancelCalls(mOkHttpClient.dispatcher().queuedCalls(), null);
+        cancelCalls(mOkHttpClient.dispatcher().runningCalls(), null);
     }
 
     /**
-     * 取消对应tag网络网络请求
+     * 取消对应tag网络请求
      */
     public void cancelTag(Object tag) {
+        checkOkHttpClientInitialized();
+        cancelCalls(mOkHttpClient.dispatcher().queuedCalls(), tag);
+        cancelCalls(mOkHttpClient.dispatcher().runningCalls(), tag);
+    }
+
+    /**
+     * 检查OkHttpClient是否已初始化
+     */
+    private void checkOkHttpClientInitialized() {
         if (mOkHttpClient == null) {
             throw new Error("请先初始化OkHttpClient, 调用OkHttpUtils.getInstance()或者OkHttpUtils.initClient()方法!");
-        }
-        for (Call call : mOkHttpClient.dispatcher().queuedCalls()) {
-            if (call.isCanceled()) {
-                continue;
-            }
-            Object tagTag = call.request().tag();
-            //取消tag逻辑
-            cancelTagMethod(tag, call, tagTag);
-        }
-        for (Call call : mOkHttpClient.dispatcher().runningCalls()) {
-            if (call.isCanceled()) {
-                continue;
-            }
-            Object tagTag = call.request().tag();
-            //取消tag逻辑
-            cancelTagMethod(tag, call, tagTag);
         }
     }
 
     /**
-     * 取消tag逻辑
+     * 取消指定的网络请求
      */
-    private void cancelTagMethod(Object tag, Call call, Object tagTag) {
-        if (tagTag instanceof TagModel) {
-            Object saveTag = ((TagModel) tagTag).getTag();
-            boolean tagIsString = tag instanceof String;
-            boolean saveTagIsString = saveTag instanceof String;
-            if (tagIsString
-                    && saveTagIsString) {
-                if (tag.equals(saveTag)) {
-                    call.cancel();
-                }
-            } else if (!tagIsString && !saveTagIsString) {
-                if (tag == saveTag) {
+    private void cancelCalls(Iterable<Call> calls, Object tag) {
+        for (Call call : calls) {
+            if (call.isCanceled()) {
+                continue;
+            }
+            if (tag == null) {
+                // 取消所有请求
+                call.cancel();
+            } else {
+                // 取消指定tag的请求
+                Object callTag = call.request().tag();
+                if (shouldCancelTag(tag, callTag)) {
                     call.cancel();
                 }
             }
         }
+    }
+
+    /**
+     * 判断是否应该取消指定tag的请求
+     */
+    private boolean shouldCancelTag(Object tag, Object callTag) {
+        if (!(callTag instanceof TagModel)) {
+            return false;
+        }
+        Object saveTag = ((TagModel) callTag).getTag();
+        if (tag == null || saveTag == null) {
+            return false;
+        }
+        // 字符串类型使用equals比较，其他类型使用==比较
+        if (tag instanceof String && saveTag instanceof String) {
+            return tag.equals(saveTag);
+        } else if (!(tag instanceof String) && !(saveTag instanceof String)) {
+            return tag == saveTag;
+        }
+        return false;
     }
 
     public static GetWebSocketBuilder WebSocket() {

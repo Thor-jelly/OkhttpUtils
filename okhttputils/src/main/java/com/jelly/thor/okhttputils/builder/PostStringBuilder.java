@@ -5,7 +5,6 @@ import androidx.annotation.NonNull;
 import com.jelly.thor.okhttputils.request.PostStringRequest;
 import com.jelly.thor.okhttputils.request.RequestCall;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -25,37 +24,25 @@ public class PostStringBuilder extends OkHttpRequestBuilder<PostStringBuilder> i
 
     @Override
     public PostStringBuilder params(@NonNull Map<String, String> params) {
-        if (this.params == null) {
-            this.params = new LinkedHashMap<>();
-        }
-        this.params.putAll(params);
+        initParamsIfNeeded().putAll(params);
         return this;
     }
 
     @Override
     public PostStringBuilder addParam(@NonNull String key, @NonNull String value) {
-        if (this.params == null) {
-            params = new LinkedHashMap<>();
-        }
-        params.put(key, value);
+        initParamsIfNeeded().put(key, value);
         return this;
     }
 
     @Override
     public PostStringBuilder headers(@NonNull Map<String, String> headers) {
-        if (this.headers == null) {
-            this.headers = new LinkedHashMap<>();
-        }
-        this.headers.putAll(headers);
+        initHeadersIfNeeded().putAll(headers);
         return this;
     }
 
     @Override
     public PostStringBuilder addHeader(@NonNull String key, @NonNull String value) {
-        if (this.headers == null) {
-            this.headers = new LinkedHashMap<>();
-        }
-        this.headers.put(key, value);
+        initHeadersIfNeeded().put(key, value);
         return this;
     }
 

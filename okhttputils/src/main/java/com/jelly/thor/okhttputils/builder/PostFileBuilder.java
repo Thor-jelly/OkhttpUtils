@@ -9,7 +9,6 @@ import com.jelly.thor.okhttputils.request.PostFileRequest;
 import com.jelly.thor.okhttputils.request.RequestCall;
 
 import java.io.File;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,37 +27,25 @@ public class PostFileBuilder extends OkHttpRequestBuilder<PostFileBuilder> imple
 
     @Override
     public PostFileBuilder params(@NonNull Map<String, String> params) {
-        if (this.params == null) {
-            this.params = new LinkedHashMap<>();
-        }
-        this.params.putAll(params);
+        initParamsIfNeeded().putAll(params);
         return this;
     }
 
     @Override
     public PostFileBuilder addParam(@NonNull String key, @NonNull String value) {
-        if (this.params == null) {
-            params = new LinkedHashMap<>();
-        }
-        params.put(key, value);
+        initParamsIfNeeded().put(key, value);
         return this;
     }
 
     @Override
     public PostFileBuilder headers(@NonNull Map<String, String> headers) {
-        if (this.headers == null) {
-            this.headers = new LinkedHashMap<>();
-        }
-        this.headers.putAll(headers);
+        initHeadersIfNeeded().putAll(headers);
         return this;
     }
 
     @Override
     public PostFileBuilder addHeader(@NonNull String key, @NonNull String value) {
-        if (this.headers == null) {
-            this.headers = new LinkedHashMap<>();
-        }
-        this.headers.put(key, value);
+        initHeadersIfNeeded().put(key, value);
         return this;
     }
 

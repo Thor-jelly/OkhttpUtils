@@ -1,15 +1,14 @@
 plugins {
     id 'com.android.application'
-    id 'kotlin-android'
     id 'kotlin-parcelize'
 }
 
 android {
-    compileSdk 34
+    compileSdk 36
     defaultConfig {
         applicationId "com.jelly.thor.example"
-        minSdkVersion 21
-        targetSdkVersion 34
+        minSdkVersion 23
+        targetSdkVersion 36
         versionCode 1
         versionName "1.0"
 
@@ -19,37 +18,40 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_21
         targetCompatibility JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = "21"
+    kotlin {
+        jvmToolchain(21)
     }
     namespace 'com.jelly.thor.example'
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:1.7.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.2.0-beta01'
-    implementation 'androidx.core:core-ktx:1.13.1'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:2.0.20"
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
+    implementation 'androidx.core:core-ktx:1.18.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:2.2.21"
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test:runner:1.6.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+    androidTestImplementation 'androidx.test:runner:1.7.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
     implementation project(':okhttputils')
 
-    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.2'
+    implementation 'com.squareup.okhttp3:okhttp:5.3.2'
 
     //rx套餐============================================
     //rxjava
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.2'
-    implementation 'io.reactivex.rxjava3:rxjava:3.1.6'
+    implementation 'io.reactivex.rxjava3:rxjava:3.1.12'
     //rxbinding
     implementation 'com.jakewharton.rxbinding4:rxbinding:4.0.0'
     implementation 'com.jakewharton.rxbinding4:rxbinding-core:4.0.0'
@@ -63,17 +65,17 @@ dependencies {
     implementation 'com.jakewharton.rxbinding4:rxbinding-viewpager2:4.0.0'
     implementation 'com.jakewharton.rxbinding4:rxbinding-material:4.0.0'
     //rxjava生命周期
-    implementation 'com.uber.autodispose2:autodispose:2.1.1'
-    implementation 'com.uber.autodispose2:autodispose-lifecycle:2.1.1'
-    implementation 'com.uber.autodispose2:autodispose-android:2.1.1'
-    implementation 'com.uber.autodispose2:autodispose-androidx-lifecycle:2.1.1'
+    implementation 'com.uber.autodispose2:autodispose:2.2.1'
+    implementation 'com.uber.autodispose2:autodispose-lifecycle:2.2.1'
+    implementation 'com.uber.autodispose2:autodispose-android:2.2.1'
+    implementation 'com.uber.autodispose2:autodispose-androidx-lifecycle:2.2.1'
     //rx套餐============================================END
 
     //gson
-    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.google.code.gson:gson:2.14.0'
 
     //fastjson
     implementation 'com.alibaba:fastjson:1.2.80'
     implementation 'com.alibaba:fastjson:1.2.80.android'
-    implementation "org.jetbrains.kotlin:kotlin-reflect:1.7.21"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:2.2.20"
 }
